@@ -30,8 +30,8 @@ public class Person {
     private LocalDate dob; //дата рождения
     private String series; //серия паспорта
     private String number; //номер паспорта
-    private String where; //где был выдан паспорт
-    private LocalDate when; //когда был выдан паспорт
+    private String whereIssued; //где был выдан паспорт
+    private LocalDate whenIssued; //когда был выдан паспорт
     private String registration; //регистрация
     private String work; //работа
     private String tin; // taxpayer identification number ИНН
@@ -42,20 +42,20 @@ public class Person {
     }
 
     public Person(int id,
-                String sur,
-                String first,
-                String patronymic,
-                int age,
-                char sex,
-                LocalDate dob,
-                String series,
-                String number,
-                String where,
-                LocalDate when,
-                String registration,
-                String work,
-                String tin,
-                String snils) {
+                  String sur,
+                  String first,
+                  String patronymic,
+                  int age,
+                  char sex,
+                  LocalDate dob,
+                  String series,
+                  String number,
+                  String where,
+                  LocalDate when,
+                  String registration,
+                  String work,
+                  String tin,
+                  String snils) {
         this.id = id;
         this.sur = sur;
         this.first = first;
@@ -65,8 +65,8 @@ public class Person {
         this.dob = dob;
         this.series = series;
         this.number = number;
-        this.where = where;
-        this.when = when;
+        this.whereIssued = where;
+        this.whenIssued = when;
         this.registration = registration;
         this.work = work;
         this.tin = tin;
@@ -145,20 +145,20 @@ public class Person {
         this.number = passportNumber;
     }
 
-    public String getWhere() {
-        return where;
+    public String getWhereIssued() {
+        return whereIssued;
     }
 
-    public void setWhere(String where) {
-        this.where = where;
+    public void setWhereIssued(String whereIssued) {
+        this.whereIssued = whereIssued;
     }
 
-    public LocalDate getWhen() {
-        return when;
+    public LocalDate getWhenIssued() {
+        return whenIssued;
     }
 
-    public void setWhen(LocalDate when) {
-        this.when = when;
+    public void setWhenIssued(LocalDate whenIssued) {
+        this.whenIssued = whenIssued;
     }
 
     public String getRegistration() {
@@ -195,23 +195,23 @@ public class Person {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", surname='" + sur + '\'' +
-                ", firstName='" + first + '\'' +
-                ", patronymic='" + patronymic + '\'' +
-                ", age=" + age +
-                ", sex=" + sex +
-                ", dateOfBirth=" + dob +
-                ", passportSeries='" + series + '\'' +
-                ", passportNumber='" + number + '\'' +
-                ", passportNumber='" + where + '\'' +
-                ", passportNumber='" + when + '\'' +
-                ", registration='" + registration + '\'' +
-                ", work='" + work + '\'' +
-                ", tin='" + tin + '\'' +
-                ", snils='" + snils + '\'' +
-                '}';
+        return "\nUser{" +
+                "\nid=" + id +
+                ", \nsurname='" + sur + '\'' +
+                ", \nfirstName='" + first + '\'' +
+                ", \npatronymic='" + patronymic + '\'' +
+                ", \nage=" + age +
+                ", \nsex=" + sex +
+                ", \ndateOfBirth=" + dob +
+                ", \npassportSeries='" + series + '\'' +
+                ", \npassportNumber='" + number + '\'' +
+                ", \npassportNumber='" + whereIssued + '\'' +
+                ", \npassportNumber='" + whenIssued + '\'' +
+                ", \nregistration='" + registration + '\'' +
+                ", \nwork='" + work + '\'' +
+                ", \ntin='" + tin + '\'' +
+                ", \nsnils='" + snils + '\'' +
+                "\n}";
     }
 }
 
