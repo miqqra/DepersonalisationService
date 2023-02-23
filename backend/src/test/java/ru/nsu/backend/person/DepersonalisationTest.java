@@ -4,11 +4,102 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DepersonalisationTest {
+
+  @Test
+  public void matrixTest() {
+    List<Person> people = new ArrayList<>();
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+
+    Depersonalisation depersonalisation = new Depersonalisation(people);
+    var matrix = depersonalisation.createMatrix();
+    assertEquals(matrix.nofSubsets().size(), Person.PARAMS_COUNT);
+
+    for (int i = 0; i < matrix.nofElements().length; i++) {
+      assertEquals(matrix.nofElements()[i].size(), matrix.nofSubsets().get(i));
+      int sum = 0;
+      for (var k : matrix.nofElements()[i]) {
+        sum += k;
+      }
+      assertEquals(sum, people.size());
+    }
+  }
+
+  @Test
+  public void mapTest() {
+    @SuppressWarnings("unchecked") Depersonalisation.MatrixOfParameters matrix = new Depersonalisation.MatrixOfParameters(
+        Arrays.asList(3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+        new List[]{
+            Arrays.asList(3, 2, 3),
+
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+            List.of(8),
+        },
+        Arrays.asList(
+            new Depersonalisation.SubsetPermutationParameters(2, new int[]{2, 1, 1}),
+
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4}),
+            new Depersonalisation.SubsetPermutationParameters(1, new int[]{4})
+        )
+    );
+    List<Person> people = new ArrayList<>();
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+    people.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+
+    Depersonalisation depersonalisation = new Depersonalisation(people);
+    var map = depersonalisation.createMapList(matrix);
+    var check = map[0];
+    int[] expected = new int[]{4, 3, 7, 5, 6, 1, 2, 0};
+    int[] actual = new int[8];
+    for (int i = 0; i < check.length; i++) {
+      actual[i] = check[i].newPos();
+    }
+    assertEquals(expected, actual);
+  }
 
   @Test
   public void permuteTest() {
