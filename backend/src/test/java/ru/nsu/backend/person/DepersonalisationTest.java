@@ -96,9 +96,9 @@ class DepersonalisationTest {
     int[] expected = new int[]{4, 3, 7, 5, 6, 1, 2, 0};
     int[] actual = new int[8];
     for (int i = 0; i < check.length; i++) {
-      actual[i] = check[i].newPos();
+      actual[i] = check[i].oldPos();
     }
-    assertEquals(expected, actual);
+    assertEquals(Arrays.toString(expected), Arrays.toString(actual));
   }
 
   @Test
