@@ -32,13 +32,13 @@ public class PersonController {
         personService.addNewPerson(person);
     }
 
-    @DeleteMapping(path = "{personId}")
+    @DeleteMapping(path = "/{personId}")
     public void deletePerson(@PathVariable("personId") Integer personId) {
         personService.deletePerson(personId);
     }
 
-    @PutMapping(path = "{personId")
-    public void updatePerson(@PathVariable("personId") Integer personId,
+    @PutMapping( "/{personId}")
+    public void updatePerson(@PathVariable Integer personId,
                              @RequestParam(required = false) String name,
                              @RequestParam(required = false) String surname,
                              @RequestParam(required = false) String fatherName,
