@@ -7,10 +7,14 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table
 public class Person {
+
+    public static final int PARAMS_COUNT = 15;
+
     @Id
     @SequenceGenerator(
             name = "person_sequence",
@@ -212,6 +216,19 @@ public class Person {
                 ", \ntin='" + tin + '\'' +
                 ", \nsnils='" + snils + '\'' +
                 "\n}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return id == person.id && age == person.age && sex == person.sex && Objects.equals(sur, person.sur) && Objects.equals(first, person.first) && Objects.equals(patronymic, person.patronymic) && Objects.equals(dob, person.dob) && Objects.equals(series, person.series) && Objects.equals(number, person.number) && Objects.equals(whereIssued, person.whereIssued) && Objects.equals(whenIssued, person.whenIssued) && Objects.equals(registration, person.registration) && Objects.equals(work, person.work) && Objects.equals(tin, person.tin) && Objects.equals(snils, person.snils);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, sur, first, patronymic, age, sex, dob, series, number, whereIssued, whenIssued, registration, work, tin, snils);
     }
 }
 
