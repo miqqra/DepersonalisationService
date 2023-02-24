@@ -27,8 +27,10 @@ public class WebSecurityConfiguration {
                     .hasRole(Roles.ROOT_)
                 .antMatchers("/**/admin/**")
                     .hasRole(Roles.ADMIN_)
-                .antMatchers("/**")
+                .antMatchers("/**/user/**")
                     .hasRole(Roles.USER_)
+                .antMatchers("/**")
+                    .hasRole(Roles.ROOT_)
         ;
 
 
