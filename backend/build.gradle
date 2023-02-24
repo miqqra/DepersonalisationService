@@ -23,9 +23,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-parent:1.2.1.RELEASE'
 }
-/*
+
 tasks.named('test') {
     useJUnitPlatform()
 }
-
- */

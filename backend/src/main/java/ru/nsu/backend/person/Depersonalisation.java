@@ -147,6 +147,11 @@ public class Depersonalisation {
       int r0 = matrix.permutations.get(column).r0;
       int[] rv = matrix.permutations.get(column).rv;
 
+      int[] subsetPositions = new int[subsetCount];
+      for(int pos = 0, i = 0; i < subsetCount; pos += matrix.nofElements[column].get(i), i++) {
+        subsetPositions[i] = pos;
+      }
+
       for(
               int row = 0, subset = subsetCount - r0;
               row == 0 || subset != subsetCount - r0;
@@ -154,7 +159,9 @@ public class Depersonalisation {
       ) {
         int numCount = matrix.nofElements[column].get(subset);
         for(int k = 0; k < numCount; k++, row++) {
-          result[column][row] = new MapToNewPosition(row, ( k + rv[subset] ) % numCount + row - k);
+          int oldPos = subsetPositions[subset] + k;
+          int newPos = ( k + rv[subset] ) % numCount + row - k;
+          result[column][newPos] = new MapToNewPosition(oldPos, newPos);
         }
       }
 
