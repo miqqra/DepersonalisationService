@@ -88,7 +88,7 @@ public class AppUserService {
         }
         var role = roleRepository.findByName(roleName);
         if (role.isEmpty()) {
-                log.warn("Role {} not found", roleName);
+            log.warn("Role {} not found", roleName);
             throw new ResponseException(HttpStatus.NOT_FOUND, "Role not found: " + roleName);
         }
         log.info("Added role {} to user {}", roleName, userName);
@@ -96,7 +96,7 @@ public class AppUserService {
         return user.get();
     }
 
-    public void deleteRoleFromUser(String userName, String roleName) throws ResponseException {
+    public AppUser deleteRoleFromUser(String userName, String roleName) throws ResponseException {
         checkUserName(userName);
         log.info("Start delete role {} from user {}", roleName, userName);
         var user = userRepository.findByUsername(userName);
@@ -111,6 +111,7 @@ public class AppUserService {
         }
         user.get().getRoles().remove(role.get());
         log.info("Deleted role {} from user {}", roleName, userName);
+        return user.get();
     }
 
     public AppUser getUser(String username) throws ResponseException {
@@ -129,17 +130,18 @@ public class AppUserService {
     }
 
     public List<Role> getRoles() {
+        log.info("Get all roles");
         return roleRepository.findAll();
     }
 
 
     public static void checkUserName(String username) throws ResponseException {
         if (username == null || username.isBlank()) {
-            log.error("Null or empty username");
+            log.warn("Null or empty username");
             throw new ResponseException(HttpStatus.BAD_REQUEST, "There is no username");
         }
         if (!username.matches("(\\w)+")) {
-            log.error("Bad username {}", username);
+            log.warn("Bad username {}", username);
             throw new ResponseException(HttpStatus.BAD_REQUEST, "Bad username. Username must contains" +
                     "only digits letters");
         }
@@ -147,7 +149,7 @@ public class AppUserService {
 
     public static void checkPassword(String password) throws ResponseException {
         if (password == null || password.isBlank()) {
-            log.error("Null password in checking");
+            log.warn("Null password in checking");
             throw new ResponseException(HttpStatus.BAD_REQUEST, "There is no password");
         }
         if (!password.matches("(\\S)+")) {
@@ -164,14 +166,28 @@ public class AppUserService {
 
     public static void checkRole(Role role) throws ResponseException {
         if (role == null) {
-            log.error("Null role in checking");
+            log.warn("Null role in checking");
             throw new ResponseException(HttpStatus.BAD_REQUEST, "There is no role");
         }
         if (!role.getName().matches("(\\S)+")) {
-            log.error("Bad role name {}", role.getName());
+            log.warn("Bad role name {}", role.getName());
             throw new ResponseException(HttpStatus.BAD_REQUEST, "Bad roleName. roleName must contains" +
                     "only digits letters");
         }
+
+    }
+
+    public void deleteRole(String roleName) throws ResponseException {
+        if (!roleExists(roleName)) {
+            log.warn("No role {} for delete", roleName);
+            ResponseException.throwResponse(HttpStatus.BAD_REQUEST, "There is no role in data");
+        }
+        Role role = roleRepository.findByName(roleName).get();
+        for (AppUser user : getUsers()) {
+            user.removeRole(role);
+        }
+        roleRepository.deleteByName(roleName);
+        log.info("Deleted role {}", roleName);
     }
 
     public boolean roleExists(Role role) {

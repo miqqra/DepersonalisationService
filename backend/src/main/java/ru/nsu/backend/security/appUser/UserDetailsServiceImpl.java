@@ -34,6 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("User has no roles");
         }
         log.info("User {} try to connect", username);
+        log.info("Roles: {}", account.getRoles());
         Collection<GrantedAuthority> authorities = account.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName())).collect(toList());
         return new User(account.getUsername(), account.getPassword(), account.isEnabled(),

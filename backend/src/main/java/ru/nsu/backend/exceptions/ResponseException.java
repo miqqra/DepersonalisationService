@@ -30,6 +30,9 @@ public class ResponseException extends Exception {
     public ResponseEntity<?> responseWithJSON() {
         return ResponseEntity.status(httpStatus.value()).body(this);
     }
+    public static void throwResponse(HttpStatus httpStatus, String reason) throws ResponseException {
+        throw new ResponseException(httpStatus, reason);
+    }
 }
 
 @Data

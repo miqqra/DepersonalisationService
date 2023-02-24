@@ -52,4 +52,8 @@ public class AppUser {
     )
 
     private Set<Role> roles;
+    public void removeRole(Role role){
+        roles.remove(role);
+
+    }
 }

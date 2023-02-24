@@ -2,6 +2,8 @@ package ru.nsu.backend.security.controller;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/accounts")
+@Slf4j
 public class AccountResource {
     private final AppUserService accountService;
 
@@ -38,12 +41,12 @@ public class AccountResource {
         return ResponseEntity.ok(newAccount);
     }
 
-    @GetMapping
+    @GetMapping("/admin")
     public ResponseEntity<List<AppUser>> getAccount() {
         return ResponseEntity.ok(accountService.getUsers());
     }
 
-    @GetMapping("/roles")
+    @GetMapping("/admin/roles")
     public ResponseEntity<List<Role>> getRoles() {
         return ResponseEntity.ok(accountService.getRoles());
     }
@@ -64,7 +67,33 @@ public class AccountResource {
         return ResponseEntity.ok(accountService.saveRole(role));
     }
 
+    @PostMapping("/root/removerole")
+    public ResponseEntity<?> deleteRoleFromUser(@RequestBody RoleToUserForm form) {
+        try {
+            return ResponseEntity.ok(accountService.deleteRoleFromUser(form.getUsername(), form.getRole()));
+        } catch (ResponseException e) {
+            return e.response();
+        }
+    }
 
+    @PostMapping("/root/deleterole")
+    public ResponseEntity<?> deleteRole(@RequestBody RoleNameForm roleName) {
+        try {
+            log.debug("roleName {}", roleName);
+            accountService.deleteRole(roleName.getRoleName());
+            return ResponseEntity.ok("Role " + roleName + " was deleted");
+        } catch (ResponseException e) {
+            return e.response();
+        }
+    }
+
+
+}
+
+@Data
+@ToString
+class RoleNameForm {
+    private String roleName;
 }
 
 @Data

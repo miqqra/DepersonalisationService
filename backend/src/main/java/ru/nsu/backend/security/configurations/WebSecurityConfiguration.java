@@ -21,47 +21,34 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http.csrf().disable()
-//                .authorizeHttpRequests()
-//                .antMatchers("**/root/**")
-//                .hasRole(StaticRoles.ROOT)
-//                .antMatchers("**/admin/**")
-//                .authenticated()
-//                .anyRequest()
-//                .hasAnyRole(StaticRoles.ADMIN, StaticRoles.ROOT)
-////                .permitAll()
-//                .and()
-//                .authenticationProvider(authenticationProvider)
-//                .httpBasic(withDefaults())
-//                .sessionManagement()
-//                .sessionCreationPolicy(STATELESS);
         http.csrf().disable()
                 .authorizeHttpRequests()
-                .antMatchers("/auth")
-                .permitAll()
-                .antMatchers("/accounts/roles")
-                .hasAnyRole(Roles.ROOT_, Roles.ADMIN_)
-                .antMatchers("**/admin/**")
-                .hasAnyRole(Roles.ADMIN_)
-                .antMatchers("**/admin")
-                .hasAnyRole(Roles.ADMIN_)
-                .antMatchers("**/user/**")
-                .hasAnyRole(Roles.USER_)
-                .antMatchers("**/user")
-                .hasAnyRole(Roles.USER_)
-                .antMatchers("**/root/**")
-                .hasAnyRole(Roles.ROOT_)
-                .antMatchers("**/root")
-                .hasAnyRole(Roles.ROOT_)
-                .anyRequest()
-                .hasAnyRole(Roles.ROOT_)
+                .antMatchers("/**/root/**")
+                    .hasRole(Roles.ROOT_)
+                .antMatchers("/**/admin/**")
+                    .hasRole(Roles.ADMIN_)
+                .antMatchers("/**")
+                    .hasRole(Roles.USER_)
+        ;
+
+
 //                .permitAll()
-                .and()
+        http
                 .authenticationProvider(authenticationProvider)
                 .httpBasic(withDefaults())
                 .sessionManagement()
-                .sessionCreationPolicy(STATELESS)
-        ;
+                .sessionCreationPolicy(STATELESS);
+//        http
+//                .authorizeHttpRequests()
+//                .antMatchers("/**/root/**").hasRole(Roles.ROOT_)
+//                .antMatchers("/**/admin/**").hasRole(Roles.ADMIN_)
+//                .antMatchers("/**/user/**").hasRole(Roles.USER_)
+//                .anyRequest()
+//                .hasAnyRole(Roles.ROOT)
+//                .and()
+//                .formLogin();
+//
+//        http.authenticationProvider(authenticationProvider).httpBasic(withDefaults()).sessionManagement().sessionCreationPolicy(STATELESS);
 
         return http.build();
     }
