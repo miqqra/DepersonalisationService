@@ -24,9 +24,9 @@ public class ApplicationStartRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        userService.saveRole(new Role(Roles.USER));
-        userService.saveRole(new Role(Roles.ADMIN));
-        userService.saveRole(new Role(Roles.ROOT));
+        roleRepository.save(new Role(Roles.USER));
+        roleRepository.save(new Role(Roles.ADMIN));
+        roleRepository.save(new Role(Roles.ROOT));
         generatingRoot();
         generatingAdmin();
         generatingUser();

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.nsu.backend.exceptions.ResponseException;
 import ru.nsu.backend.security.role.Role;
 import ru.nsu.backend.security.role.RoleRepository;
+import ru.nsu.backend.security.role.Roles;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -30,7 +31,8 @@ public class AppUserService {
     }
 
 
-    public Role saveRole(Role role) {
+    public Role saveRole(Role role) throws ResponseException {
+        Roles.greaterPermission(role.getName());
         log.info("Save new role with name {}", role.getName());
         return roleRepository.save(role);
     }
@@ -46,6 +48,7 @@ public class AppUserService {
         if (roles == null) {
             roles = new HashSet<>();
         }
+        Roles.greaterPermission(roles);
         checkPassword(password);
         checkUserName(userName);
         log.info("Adding new user {} with {}", userName, roles);
@@ -80,6 +83,7 @@ public class AppUserService {
 
     public AppUser addRoleToUser(String userName, String roleName) throws ResponseException {
         checkUserName(userName);
+        Roles.greaterPermission(roleName);
         log.info("Start adding role {} to user {}", roleName, userName);
         var user = userRepository.findByUsername(userName);
         if (user.isEmpty()) {
@@ -98,6 +102,7 @@ public class AppUserService {
 
     public AppUser deleteRoleFromUser(String userName, String roleName) throws ResponseException {
         checkUserName(userName);
+        Roles.greaterPermission(roleName);
         log.info("Start delete role {} from user {}", roleName, userName);
         var user = userRepository.findByUsername(userName);
         if (user.isEmpty()) {
@@ -116,6 +121,7 @@ public class AppUserService {
 
     public AppUser getUser(String username) throws ResponseException {
         log.info("Getting user {}", username);
+        Roles.mustBeAdmin();
         var user = userRepository.findByUsername(username);
         if (user.isPresent()) {
             return user.get();
@@ -124,7 +130,8 @@ public class AppUserService {
         }
     }
 
-    public List<AppUser> getUsers() {
+    public List<AppUser> getUsers() throws ResponseException {
+        Roles.mustBeAdmin();
         log.info("Get users {}", SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         return userRepository.findAll();
     }
@@ -160,6 +167,10 @@ public class AppUserService {
     }
 
     public static void checkUser(AppUser user) throws ResponseException {
+        if (user.getRoles() == null) {
+            user.setRoles(new HashSet<>());
+        }
+        Roles.greaterPermission(user.getRoles().stream().map(Role::toString).collect(Collectors.toList()));
         checkUserName(user.getUsername());
         checkPassword(user.getPassword());
     }
@@ -178,6 +189,11 @@ public class AppUserService {
     }
 
     public void deleteRole(String roleName) throws ResponseException {
+        Roles.greaterPermission(roleName);
+        if (Roles.isBasicRole(roleName)) {
+            log.warn("Trying to delete basic roles");
+            ResponseException.throwResponse(HttpStatus.BAD_REQUEST, "DONT DELETE BASIC ROLES");
+        }
         if (!roleExists(roleName)) {
             log.warn("No role {} for delete", roleName);
             ResponseException.throwResponse(HttpStatus.BAD_REQUEST, "There is no role in data");
@@ -188,6 +204,18 @@ public class AppUserService {
         }
         roleRepository.deleteByName(roleName);
         log.info("Deleted role {}", roleName);
+    }
+
+    public void deleteUser(String username) throws ResponseException {
+        if (username == null) {
+            ResponseException.throwResponse(HttpStatus.BAD_REQUEST, "There is no username");
+        }
+        AppUser appUser = getUser(username);
+        Roles.greaterPermission(appUser.getRoles());
+        appUser.getRoles().clear();
+
+        userRepository.deleteByUsername(username);
+        log.info("Deleted user {}", username);
     }
 
     public boolean roleExists(Role role) {

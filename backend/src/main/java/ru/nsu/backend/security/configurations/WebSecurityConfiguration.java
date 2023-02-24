@@ -24,13 +24,13 @@ public class WebSecurityConfiguration {
         http.csrf().disable()
                 .authorizeHttpRequests()
                 .antMatchers("/**/root/**")
-                    .hasRole(Roles.ROOT_)
+                    .hasRole(Roles._ROOT)
                 .antMatchers("/**/admin/**")
-                    .hasRole(Roles.ADMIN_)
+                    .hasRole(Roles._ADMIN)
                 .antMatchers("/**/user/**")
-                    .hasRole(Roles.USER_)
+                    .hasRole(Roles._USER)
                 .antMatchers("/**")
-                    .hasRole(Roles.ROOT_)
+                    .hasRole(Roles._ROOT)
         ;
 
 
