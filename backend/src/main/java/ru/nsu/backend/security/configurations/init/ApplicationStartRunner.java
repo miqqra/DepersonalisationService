@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.nsu.backend.security.appUser.AppUser;
 import ru.nsu.backend.security.appUser.AppUserRepository;
-import ru.nsu.backend.security.appUser.AppUserServiceImpl;
+import ru.nsu.backend.security.appUser.AppUserService;
 import ru.nsu.backend.security.role.Role;
 import ru.nsu.backend.security.role.RoleRepository;
 import ru.nsu.backend.security.role.RoleServiceImpl;
@@ -22,7 +22,7 @@ import static java.util.Arrays.asList;
 public class ApplicationStartRunner implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final RoleServiceImpl roleService;
-    private final AppUserServiceImpl appUserService;
+    private final AppUserService appUserService;
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder encoder;
 

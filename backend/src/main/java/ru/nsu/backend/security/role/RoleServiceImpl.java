@@ -2,6 +2,7 @@ package ru.nsu.backend.security.role;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.nsu.backend.exceptions.ResponseException;
 import ru.nsu.backend.security.appUser.AppUserRepository;
 import ru.nsu.backend.security.appUser.AppUserService;
 
@@ -15,8 +16,8 @@ public class RoleServiceImpl {
     private final AppUserService userService;
 
     @Transactional
-    public Role addRoleForUse(String userName, Role role) {
-        var user = userService.findByUsername(userName);
+    public Role addRoleForUse(String userName, Role role) throws ResponseException {
+        var user = userService.getUser(userName);
         if (user == null) {
             throw new IllegalStateException("No user");
         }

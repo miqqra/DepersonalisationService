@@ -24,6 +24,10 @@ public class ResponseException extends Exception {
     public ResponseEntity<?> response() {
         return ResponseEntity.status(httpStatus.value()).body(reason);
     }
+
+    public ResponseEntity<?> responseWithJSON() {
+        return ResponseEntity.status(httpStatus.value()).body(this);
+    }
 }
 
 
