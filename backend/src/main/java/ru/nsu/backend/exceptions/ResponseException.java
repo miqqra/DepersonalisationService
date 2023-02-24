@@ -1,5 +1,7 @@
 package ru.nsu.backend.exceptions;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -22,7 +24,7 @@ public class ResponseException extends Exception {
     }
 
     public ResponseEntity<?> response() {
-        return ResponseEntity.status(httpStatus.value()).body(reason);
+        return ResponseEntity.status(httpStatus.value()).body(new Response(httpStatus, reason));
     }
 
     public ResponseEntity<?> responseWithJSON() {
@@ -30,5 +32,11 @@ public class ResponseException extends Exception {
     }
 }
 
+@Data
+@AllArgsConstructor
+class Response {
+    private HttpStatus status;
+    private String message;
+}
 
 

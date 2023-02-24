@@ -7,9 +7,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.nsu.backend.security.role.StaticRoles;
+import ru.nsu.backend.security.role.Roles;
 
-import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -22,20 +21,38 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http.csrf().disable()
+//                .authorizeHttpRequests()
+//                .antMatchers("**/root/**")
+//                .hasRole(StaticRoles.ROOT)
+//                .antMatchers("**/admin/**")
+//                .authenticated()
+//                .anyRequest()
+//                .hasAnyRole(StaticRoles.ADMIN, StaticRoles.ROOT)
+////                .permitAll()
+//                .and()
+//                .authenticationProvider(authenticationProvider)
+//                .httpBasic(withDefaults())
+//                .sessionManagement()
+//                .sessionCreationPolicy(STATELESS);
         http.csrf().disable()
                 .authorizeHttpRequests()
-                .antMatchers(POST, "/api/**")
+                .antMatchers("/accounts")
                 .permitAll()
-                .antMatchers("/hello")
+                .antMatchers("/accounts/roles")
+                .hasAnyRole(Roles.ROOT_, Roles.ADMIN_)
+                .antMatchers("**/root/**")
                 .authenticated()
                 .anyRequest()
-                .hasAnyRole(StaticRoles.ADMIN, StaticRoles.SUPER_ADMIN)
+                .hasAnyRole(Roles.ROOT_)
 //                .permitAll()
                 .and()
                 .authenticationProvider(authenticationProvider)
                 .httpBasic(withDefaults())
                 .sessionManagement()
-                .sessionCreationPolicy(STATELESS);
+                .sessionCreationPolicy(STATELESS)
+        ;
+
         return http.build();
     }
 }
