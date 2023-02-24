@@ -31,6 +31,13 @@ public class PersonService {
         }
     }
 
+    public List<Person> depersonalisePeople(){
+        List<Person> newTable = new Depersonalisation(personRepository.findAll()).depersonalise();
+        personRepository.deleteAll();
+        personRepository.saveAll(newTable);
+        return newTable;
+    }
+
     @Transactional
     public void updateInfo(Integer personId,
                            String name,
@@ -49,19 +56,19 @@ public class PersonService {
                            String snils) {
         Person person = personRepository.findById(personId).orElse(null);
         if (person != null) {
-            if (name != null && name.length() > 0) {
+            if (name != null && !name.isEmpty() && !name.isBlank()) {
                 person.setFirst(name);
             }
-            if (surname != null && surname.length() > 0) {
+            if (surname != null && !surname.isEmpty() && !surname.isBlank()) {
                 person.setSur(surname);
             }
-            if (fatherName != null && fatherName.length() > 0) {
+            if (fatherName != null && !fatherName.isEmpty() && !fatherName.isBlank()) {
                 person.setPatronymic(fatherName);
             }
             if (age != null && age > 0) {
                 person.setAge(age);
             }
-            if (sex != null && (sex == 'M' || sex == 'F')) {
+            if (sex != null && (Character.toLowerCase(sex) == 'M' || Character.toLowerCase(sex) == 'F')) {
                 person.setSex(sex);
             }
             if (dateOfBirth != null) {
@@ -71,13 +78,15 @@ public class PersonService {
                 } catch (DateTimeParseException ignored) {
                 }
             }
-            if (passportSeries != null && passportSeries.length() > 0) {
+            if (passportSeries != null && !passportSeries.isEmpty() && !passportSeries.isBlank()) {
                 person.setSeries(passportSeries);
             }
-            if (passportNumber != null && passportNumber.length() > 0) {
+            if (passportNumber != null && !passportNumber.isEmpty() && !passportNumber.isBlank()) {
                 person.setNumber(passportNumber);
             }
-            if (wherePassportWasIssued != null && wherePassportWasIssued.length() > 0) {
+            if (wherePassportWasIssued != null &&
+                    !wherePassportWasIssued.isEmpty() &&
+                    !wherePassportWasIssued.isBlank()) {
                 person.setWhereIssued(wherePassportWasIssued);
             }
             if (whenPassportWasIssued != null) {
@@ -87,16 +96,18 @@ public class PersonService {
                 } catch (DateTimeParseException ignored) {
                 }
             }
-            if (registration != null && registration.length() > 0) {
+            if (registration != null && !registration.isEmpty() && !registration.isBlank()) {
                 person.setRegistration(registration);
             }
             if (work != null && work.length() > 0) {
                 person.setWork(work);
             }
-            if (taxpayerIdentificationNumber != null && taxpayerIdentificationNumber.length() > 0) {
+            if (taxpayerIdentificationNumber != null &&
+                    !taxpayerIdentificationNumber.isEmpty() &&
+                    !taxpayerIdentificationNumber.isBlank()) {
                 person.setTin(taxpayerIdentificationNumber);
             }
-            if (snils != null && snils.length() > 0) {
+            if (snils != null && !snils.isEmpty() && !snils.isBlank()) {
                 person.setSnils(snils);
             }
         }

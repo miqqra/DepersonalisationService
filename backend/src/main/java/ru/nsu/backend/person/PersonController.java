@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/hello")
+@RequestMapping("/")
 @AllArgsConstructor
 public class PersonController {
     private final PersonService personService;
@@ -17,8 +17,13 @@ public class PersonController {
         return personService.getPeople();
     }
 
-    @PostMapping(value = "/add")
-    public ResponseEntity<String> addNew(@RequestParam String name) {
+    @GetMapping("/updated")
+    public List<Person> depersonalisePeople(){
+        return personService.depersonalisePeople();
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<String> addNewPerson(@RequestParam String name) {
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body("Empty string");
         }
@@ -28,7 +33,7 @@ public class PersonController {
         return ResponseEntity.ok().body("Saved");
     }
 
-    @PutMapping
+    @PostMapping
     public void addNewPerson(@RequestBody Person person) {
         personService.addNewPerson(person);
     }
