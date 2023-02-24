@@ -6,33 +6,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.nsu.backend.security.appUser.AppUser;
 import ru.nsu.backend.security.appUser.AppUserRepository;
-import ru.nsu.backend.security.appUser.AppUserServiceImpl;
+import ru.nsu.backend.security.appUser.AppUserService;
 import ru.nsu.backend.security.role.Role;
 import ru.nsu.backend.security.role.RoleRepository;
-import ru.nsu.backend.security.role.RoleServiceImpl;
-import ru.nsu.backend.security.role.StaticRoles;
+import ru.nsu.backend.security.role.Roles;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static java.util.Arrays.asList;
-
 @Component
 @RequiredArgsConstructor
 public class ApplicationStartRunner implements CommandLineRunner {
+    private final AppUserService userService;
     private final RoleRepository roleRepository;
-    private final RoleServiceImpl roleService;
-    private final AppUserServiceImpl appUserService;
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder encoder;
 
     @Override
     public void run(String... args) throws Exception {
-        Role roleUser = new Role(1L, "123", StaticRoles.USER);
-        Role roleAdmin = new Role(2L, "456", StaticRoles.ADMIN);
-        Role roleSuperAdmin = new Role(3L, "789", StaticRoles.SUPER_ADMIN);
-        roleRepository.saveAll(asList(roleUser, roleAdmin, roleSuperAdmin));
-
+        roleRepository.save(new Role(Roles.USER));
+        roleRepository.save(new Role(Roles.ADMIN));
+        roleRepository.save(new Role(Roles.ROOT));
         generatingRoot();
         generatingAdmin();
         generatingUser();
@@ -46,12 +40,13 @@ public class ApplicationStartRunner implements CommandLineRunner {
         root.setId(1L);
         root.setPassword(encoder.encode(root.getPassword()));
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(StaticRoles.USER));
-        roles.add(roleRepository.findByName(StaticRoles.ADMIN));
-        roles.add(roleRepository.findByName(StaticRoles.SUPER_ADMIN));
+        roles.add(roleRepository.findByName(Roles.USER).get());
+        roles.add(roleRepository.findByName(Roles.ADMIN).get());
+        roles.add(roleRepository.findByName(Roles.ROOT).get());
         root.setRoles(roles);
         appUserRepository.save(root);
     }
+
     void generatingAdmin() {
         AppUser root = new AppUser();
         root.setUsername("admin");
@@ -59,11 +54,12 @@ public class ApplicationStartRunner implements CommandLineRunner {
         root.setId(2L);
         root.setPassword(encoder.encode(root.getPassword()));
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(StaticRoles.USER));
-        roles.add(roleRepository.findByName(StaticRoles.ADMIN));
+        roles.add(roleRepository.findByName(Roles.USER).get());
+        roles.add(roleRepository.findByName(Roles.ADMIN).get());
         root.setRoles(roles);
         appUserRepository.save(root);
     }
+
     void generatingUser() {
         AppUser root = new AppUser();
         root.setUsername("user");
@@ -71,7 +67,7 @@ public class ApplicationStartRunner implements CommandLineRunner {
         root.setId(3L);
         root.setPassword(encoder.encode(root.getPassword()));
         Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName(StaticRoles.USER));
+        roles.add(roleRepository.findByName(Roles.USER).get());
         root.setRoles(roles);
         appUserRepository.save(root);
     }

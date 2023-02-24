@@ -7,9 +7,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.nsu.backend.security.role.StaticRoles;
+import ru.nsu.backend.security.role.Roles;
 
-import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -24,18 +23,35 @@ public class WebSecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeHttpRequests()
-                .antMatchers(POST, "/api/**")
-                .permitAll()
-                .antMatchers("/hello")
-                .authenticated()
-                .anyRequest()
-                .hasAnyRole(StaticRoles.ADMIN, StaticRoles.SUPER_ADMIN)
+                .antMatchers("/**/root/**")
+                    .hasRole(Roles._ROOT)
+                .antMatchers("/**/admin/**")
+                    .hasRole(Roles._ADMIN)
+                .antMatchers("/**/user/**")
+                    .hasRole(Roles._USER)
+                .antMatchers("/**")
+                    .hasRole(Roles._ROOT)
+        ;
+
+
 //                .permitAll()
-                .and()
+        http
                 .authenticationProvider(authenticationProvider)
                 .httpBasic(withDefaults())
                 .sessionManagement()
                 .sessionCreationPolicy(STATELESS);
+//        http
+//                .authorizeHttpRequests()
+//                .antMatchers("/**/root/**").hasRole(Roles.ROOT_)
+//                .antMatchers("/**/admin/**").hasRole(Roles.ADMIN_)
+//                .antMatchers("/**/user/**").hasRole(Roles.USER_)
+//                .anyRequest()
+//                .hasAnyRole(Roles.ROOT)
+//                .and()
+//                .formLogin();
+//
+//        http.authenticationProvider(authenticationProvider).httpBasic(withDefaults()).sessionManagement().sessionCreationPolicy(STATELESS);
+
         return http.build();
     }
 }
