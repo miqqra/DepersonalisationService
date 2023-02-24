@@ -18,10 +18,18 @@ public class Depersonalisation {
   }
 
   public List<Person> depersonalise() {
+    if (sourceData.size() < 5) {
+      List<Person> result = new ArrayList<>();
+      for (int i = 0; i < 5; i++) {
+        result.add(new Person(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
+      }
+      return result;
+    }
+
     MatrixOfParameters matrix = createMatrix();
-    System.out.println(matrix);
+
     MapToNewPosition[][] map = createMapList(matrix);
-    System.out.println(Arrays.deepToString(map));
+
     return permute(map);
   }
 
