@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -12,17 +14,53 @@ import java.util.List;
 public class PersonController {
     private final PersonService personService;
 
-    @GetMapping
-    public List<Person> getUsers() {
-        return personService.getPeople();
+    @GetMapping({"/user/users", "/admin/users", "/root/users"})
+    public ResponseEntity<List<Person>> getUsers() {
+        return ResponseEntity.ok(personService.getPeople());
     }
 
-    @GetMapping("/updated")
-    public List<Person> depersonalisePeople(){
-        return personService.depersonalisePeople();
+    @GetMapping({"/admin/updated", "/root/updated"})
+    public ResponseEntity<List<Person>> depersonalisePeople() {
+        return ResponseEntity.ok(personService.depersonalisePeople());
     }
 
-    @PostMapping("/add")
+    @GetMapping({"/user/sort", "/admin/sort", "root/sort"})
+    public ResponseEntity<List<Person>> sortTable(@RequestParam String param,
+                                                  @RequestParam SortingType sortingType) {
+        return ResponseEntity.ok(personService.sortTable(param, sortingType));
+    }
+
+    @GetMapping({"/user/find", "/root/find", "/admin/find"})
+    public ResponseEntity<?> findPerson(@RequestParam String param) {
+        try {
+            LocalDate localDate = LocalDate.parse(param);
+            Person person = personService.findPerson(localDate);
+            if (person != null) {
+                return ResponseEntity.ok(person);
+            } else {
+                return ResponseEntity.badRequest().body("Cannot find anything for that request");
+            }
+        } catch (DateTimeParseException e1) {
+            try {
+                Integer integer = Integer.parseInt(param);
+                Person person = personService.findPerson(integer);
+                if (person != null) {
+                    return ResponseEntity.ok(person);
+                } else {
+                    return ResponseEntity.badRequest().body("Cannot find anything for that request");
+                }
+            } catch (NumberFormatException e2) {
+                Person person = personService.findPerson(param);
+                if (person != null) {
+                    return ResponseEntity.ok(person);
+                } else {
+                    return ResponseEntity.badRequest().body("Cannot find anything for that request");
+                }
+            }
+        }
+    }
+
+    @PostMapping({"/admin/add", "/root/add"})
     public ResponseEntity<String> addNewPerson(@RequestParam String name) {
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body("Empty string");
@@ -33,33 +71,32 @@ public class PersonController {
         return ResponseEntity.ok().body("Saved");
     }
 
-    @PostMapping
-    public void addNewPerson(@RequestBody Person person) {
-        personService.addNewPerson(person);
+    @PostMapping({"/admin/add", "/root/add"})
+    public ResponseEntity<String> addNewPerson(@RequestBody Person person) {
+        if (personService.addNewPerson(person)) {
+            return ResponseEntity.ok().body("Person has been added");
+        } else {
+            return ResponseEntity.badRequest().body("Person already exists");
+        }
     }
 
-    @DeleteMapping(path = "/{personId}")
-    public void deletePerson(@PathVariable("personId") Integer personId) {
-        personService.deletePerson(personId);
-    }
-
-    @PutMapping( "/{personId}")
-    public void updatePerson(@PathVariable Integer personId,
-                             @RequestParam(required = false) String name,
-                             @RequestParam(required = false) String surname,
-                             @RequestParam(required = false) String fatherName,
-                             @RequestParam(required = false) Integer age,
-                             @RequestParam(required = false) Character sex,
-                             @RequestParam(required = false) String dateOfBirth,
-                             @RequestParam(required = false) String passportSeries,
-                             @RequestParam(required = false) String passportNumber,
-                             @RequestParam(required = false) String wherePassportWasIssued,
-                             @RequestParam(required = false) String whenPassportWasIssued,
-                             @RequestParam(required = false) String registration,
-                             @RequestParam(required = false) String work,
-                             @RequestParam(required = false) String taxpayerIdentificationNumber,
-                             @RequestParam(required = false) String snils) {
-        personService.updateInfo(personId,
+    @PutMapping({"/user/{personId}", "/root/{personId}", "/admin/{personId}"})
+    public ResponseEntity<String> updatePerson(@PathVariable Integer personId,
+                                               @RequestParam(required = false) String name,
+                                               @RequestParam(required = false) String surname,
+                                               @RequestParam(required = false) String fatherName,
+                                               @RequestParam(required = false) Integer age,
+                                               @RequestParam(required = false) Character sex,
+                                               @RequestParam(required = false) String dateOfBirth,
+                                               @RequestParam(required = false) String passportSeries,
+                                               @RequestParam(required = false) String passportNumber,
+                                               @RequestParam(required = false) String wherePassportWasIssued,
+                                               @RequestParam(required = false) String whenPassportWasIssued,
+                                               @RequestParam(required = false) String registration,
+                                               @RequestParam(required = false) String work,
+                                               @RequestParam(required = false) String taxpayerIdentificationNumber,
+                                               @RequestParam(required = false) String snils) {
+        if (personService.updateInfo(personId,
                 name,
                 surname,
                 fatherName,
@@ -73,6 +110,26 @@ public class PersonController {
                 registration,
                 work,
                 taxpayerIdentificationNumber,
-                snils);
+                snils)) {
+            return ResponseEntity.ok("Info has been updated");
+        } else {
+            return ResponseEntity.badRequest().body("Cannot find such person");
+        }
+    }
+
+    @PutMapping({"/user/{personId}", "/root/{personId}", "/admin/{personId}"})
+    public ResponseEntity<String> updatePerson(@PathVariable Integer personId,
+                                               @RequestBody Person person) {
+        personService.updateInfo(personId, person);
+        return ResponseEntity.ok().body("Info has been updated");
+    }
+
+    @DeleteMapping({"/admin/{personId}", "/root/{personId}", "/user/{personId}"})
+    public ResponseEntity<String> deletePerson(@PathVariable("personId") Integer personId) {
+        if (personService.deletePerson(personId)) {
+            return ResponseEntity.ok("Person has been deleted");
+        } else {
+            return ResponseEntity.badRequest().body("Cannot find such person to delete it");
+        }
     }
 }
