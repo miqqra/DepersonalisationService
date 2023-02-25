@@ -65,9 +65,7 @@ public class PersonController {
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body("Empty string");
         }
-        Person person = new Person();
-        person.setSur(name);
-        personService.addNewPerson(person);
+        personService.addNewPerson(name);
         return ResponseEntity.ok().body("Saved");
     }
 

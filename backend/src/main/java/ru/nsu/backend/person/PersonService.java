@@ -22,6 +22,14 @@ public class PersonService {
         return personRepository.findAll();
     }
 
+    @Transactional
+    public void addNewPerson(String name){
+        Person person = new Person();
+        person.setFirst(name);
+        personRepository.save(person);
+    }
+
+    @Transactional
     public boolean addNewPerson(Person person) {
         if (personRepository.existsById(person.getId()) || personRepository
                 .findBySurAndFirstAndPatronymicAndAgeAndSexAndDobAndSeriesAndNumberAndWhenIssuedAndWhereIssuedAndRegistrationAndWorkAndTinAndSnils(
@@ -36,6 +44,7 @@ public class PersonService {
         return true;
     }
 
+    @Transactional
     public boolean deletePerson(Integer personId) {
         if (personRepository.existsById(personId)) {
             personRepository.deleteById(personId);
@@ -46,10 +55,7 @@ public class PersonService {
     }
 
     public List<Person> depersonalisePeople() {
-        List<Person> newTable = new Depersonalisation(personRepository.findAll()).depersonalise();
-        personRepository.deleteAll();
-        personRepository.saveAll(newTable);
-        return newTable;
+        return new Depersonalisation(personRepository.findAll()).depersonalise();
     }
 
     @Transactional
@@ -124,6 +130,7 @@ public class PersonService {
             if (snils != null && !snils.isEmpty() && !snils.isBlank()) {
                 person.setSnils(snils);
             }
+            personRepository.save(person);
             return true;
         }
         return false;
@@ -154,6 +161,7 @@ public class PersonService {
             case ("work") -> Comparator.comparing(Person::getWork);
             case ("taxpayerIdentificationNumber") -> Comparator.comparing(Person::getTin);
             case ("snils") -> Comparator.comparing(Person::getSnils);
+            default -> Comparator.comparing(Person::getId);
         };
         if (sortingType == SortingType.ASC) {
             people.sort(comp);
@@ -189,21 +197,4 @@ public class PersonService {
                 personRepository.findByDob(param).orElse(null)
         );
     }
-    /*
-    private int id;
-    private String sur; //фамилия
-    private String first; //имя
-    private String patronymic; //отчество
-    private int age; //возраст
-    private char sex; //пол
-    private LocalDate dob; //дата рождения
-    private String series; //серия паспорта
-    private String number; //номер паспорта
-    private String whereIssued; //где был выдан паспорт
-    private LocalDate whenIssued; //когда был выдан паспорт
-    private String registration; //регистрация
-    private String work; //работа
-    private String tin; // taxpayer identification number ИНН
-    private String snils; //снилс
-     */
 }
