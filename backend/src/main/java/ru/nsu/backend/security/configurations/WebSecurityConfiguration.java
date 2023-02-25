@@ -36,8 +36,9 @@ public class WebSecurityConfiguration //implements WebSecurityConfigurerAdapter
                 .hasRole(Roles._ADMIN)
                 .antMatchers("/**/user/**")
                 .hasRole(Roles._USER)
-                .antMatchers("/**").hasRole(Roles.USER);
+                .antMatchers("/**").hasRole(Roles._USER);
         http
+//                .antMatcher("/log")
 //                .authenticationProvider(authenticationProvider)
 //                .httpBasic(withDefaults())
                 .sessionManagement()

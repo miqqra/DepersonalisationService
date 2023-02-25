@@ -26,6 +26,7 @@ public class AccountAuthenticationProvider extends AbstractUserDetailsAuthentica
             throw new BadCredentialsException("Credentials may not be null");
         }
         if (!encoder.matches((String) authentication.getCredentials(), userDetails.getPassword())) {
+
             throw new BadCredentialsException("Invalid credentials");
         }
         log.info("User checking {} {}", userDetails.getUsername(), authentication.getCredentials());
