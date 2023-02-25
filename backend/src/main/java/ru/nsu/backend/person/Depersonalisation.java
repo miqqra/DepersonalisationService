@@ -9,6 +9,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * The Depersonalization class ensures that the data or its order is changed
+ * so that the original personal data cannot be restored.
+ * <p>
+ * The data shuffling algorithm makes a new table from the source data,
+ * and for each row the elements are taken from different rows of the table.
+ * It ensures the reversibility of the mixing operation.
+ * It should be noted that the algorithm will work the better, the more data the table contains.
+ */
 public class Depersonalisation {
 
   private final List<Person> sourceData;
@@ -17,6 +26,12 @@ public class Depersonalisation {
     this.sourceData = List.copyOf(sourceData);
   }
 
+  /**
+   * The function takes an original table `sourceData` and
+   * permutes its elements in random order.
+   *
+   * @return A new shuffled table
+   */
   public List<Person> depersonalise() {
     if (sourceData.size() < 5) {
       List<Person> result = new ArrayList<>();
@@ -83,7 +98,7 @@ public class Depersonalisation {
   }
 
   /**
-   * Creates a new MatrixOfParameters variable
+   * Creates a new MatrixOfParameters variable.
    *
    * @return matrix of permutations
    */
@@ -137,6 +152,16 @@ public class Depersonalisation {
     return new MatrixOfParameters(numberOfSubsets, numberOfElements, permutations);
   }
 
+  /**
+   * Based on the matrix that the permutation is given,
+   * this function builds a mapping from old positions to new ones.
+   * <p>
+   * The output is a two-dimensional array, where A[i][j] stores
+   * the old and new values in the i-th column and j-th row.
+   *
+   * @param matrix matrix of parameters
+   * @return Array of N mappings from old positions to new ones
+   */
   MapToNewPosition[][] createMapList(MatrixOfParameters matrix) {
     int N = Person.PARAMS_COUNT;
     int M = sourceData.size();
@@ -161,14 +186,14 @@ public class Depersonalisation {
       }
 
       for(
-              int row = 0, subset = subsetCount - r0;
-              row == 0 || subset != subsetCount - r0;
-              subset = (subset + 1) % subsetCount
+          int row = 0, subset = subsetCount - r0;
+          row == 0 || subset != subsetCount - r0;
+          subset = (subset + 1) % subsetCount
       ) {
         int numCount = matrix.nofElements[column].get(subset);
         for(int k = 0; k < numCount; k++, row++) {
           int oldPos = subsetPositions[subset] + k;
-          int newPos = ( k + rv[subset] ) % numCount + row - k;
+          int newPos = (k + rv[subset]) % numCount + row - k;
           result[column][newPos] = new MapToNewPosition(oldPos, newPos);
         }
       }
@@ -178,6 +203,13 @@ public class Depersonalisation {
     return result;
   }
 
+  /**
+   * The function goes through all the elements of the old table
+   * and puts them in new positions in accordance with the mapping.
+   *
+   * @param map An array of mappings
+   * @return A new shuffled table
+   */
   List<Person> permute(MapToNewPosition[][] map) {
     int N = Person.PARAMS_COUNT;
     int M = sourceData.size();
