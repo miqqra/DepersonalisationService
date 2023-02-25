@@ -10,7 +10,6 @@ import ru.nsu.backend.exceptions.ResponseException;
 import ru.nsu.backend.security.appUser.AppUser;
 import ru.nsu.backend.security.appUser.AppUserService;
 import ru.nsu.backend.security.role.Role;
-import ru.nsu.backend.security.role.Roles;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ import java.util.List;
 public class AccountResource {
     private final AppUserService accountService;
 
-    @GetMapping("/root/users")
+    @GetMapping({"/admin/users", "/root/users"})
     public ResponseEntity<?> getUsers() {
         try {
             return ResponseEntity.ok(accountService.getUsers());
@@ -31,7 +30,7 @@ public class AccountResource {
         }
     }
 
-    @PostMapping("/root/adduser")
+    @PostMapping({"/admin/users/create", "/root/users/create"})
     public ResponseEntity<?> createAccount(@RequestBody AppUser account) {
         AppUser newAccount;
         try {
@@ -42,26 +41,13 @@ public class AccountResource {
         return ResponseEntity.ok(newAccount);
     }
 
-    @GetMapping("/admin")
-    public ResponseEntity<?> getAccount() {
-        try {
-            return ResponseEntity.ok(accountService.getUsers());
-        } catch (ResponseException e) {
-            return e.response();
-        }
-    }
 
-    @GetMapping("/admin/roles")
+    @GetMapping({"/roles"})
     public ResponseEntity<List<Role>> getRoles() {
-        try {
-            Roles.mustBeAdmin();
-        } catch (ResponseException e) {
-            e.response();
-        }
         return ResponseEntity.ok(accountService.getRoles());
     }
 
-    @PostMapping("/root/addtouser")
+    @PostMapping({"/root/users/addrole", "/admin/users/addrole"})
     public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form) {
         AppUser user;
         try {
@@ -72,7 +58,7 @@ public class AccountResource {
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/root/addrole")
+    @PostMapping({"/root/roles/add", "/admin/roles/add"})
     public ResponseEntity<?> saveRole(@RequestBody Role role) {
         try {
             return ResponseEntity.ok(accountService.saveRole(role));
@@ -81,7 +67,7 @@ public class AccountResource {
         }
     }
 
-    @PostMapping("/root/removerole")
+    @PostMapping({"/admin/roles/retrieve", "/root/roles/retrieve"})
     public ResponseEntity<?> deleteRoleFromUser(@RequestBody RoleToUserForm form) {
         try {
             return ResponseEntity.ok(accountService.deleteRoleFromUser(form.getUsername(), form.getRole()));
@@ -90,7 +76,7 @@ public class AccountResource {
         }
     }
 
-    @PostMapping({"/root/deleterole", "/admin/deleterole"})
+    @PostMapping({"/root/roles/delete", "/admin/roles/delete"})
     public ResponseEntity<?> deleteRole(@RequestBody RoleNameForm roleName) {
         try {
             accountService.deleteRole(roleName.getRoleName());
@@ -100,11 +86,20 @@ public class AccountResource {
         }
     }
 
-    @PostMapping({"/root/deleteuser", "/admin/deleteuser"})
+    @PostMapping({"/root/users/delete", "/admin/users/delete"})
     public ResponseEntity<?> deleteUser(@RequestBody UserNameForm userName) {
         try {
             accountService.deleteUser(userName.getUserName());
             return ResponseEntity.ok("Role " + userName + " was deleted");
+        } catch (ResponseException e) {
+            return e.response();
+        }
+    }
+
+    @PostMapping({"/root/users/changepassword", "/admin/users/changepassword"})
+    public ResponseEntity<?> changePassword(@RequestBody UserForm user) {
+        try {
+            return ResponseEntity.ok(accountService.changePassword(user.getUsername(), user.getPassword()));
         } catch (ResponseException e) {
             return e.response();
         }
@@ -130,6 +125,7 @@ class UserForm {
     private String username;
     private String password;
 }
+
 
 @Data
 class RoleToUserForm {

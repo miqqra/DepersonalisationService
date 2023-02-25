@@ -226,4 +226,11 @@ public class AppUserService {
         return roleRepository.findByName(roleName).isPresent();
     }
 
+    public AppUser changePassword(String username, String newPassword) throws ResponseException {
+        AppUser user = getUser(username);
+        Roles.greaterPermission(user.getRoles());
+        checkPassword(newPassword);
+        user.setPassword(encoder.encode(newPassword));
+        return user;
+    }
 }

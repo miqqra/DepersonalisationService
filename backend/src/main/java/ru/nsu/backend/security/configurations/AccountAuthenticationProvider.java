@@ -1,6 +1,8 @@
 package ru.nsu.backend.security.configurations;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -12,9 +14,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AccountAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+@Slf4j
+public class AccountAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider implements AuthenticationManager {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder encoder;
+
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
@@ -22,12 +26,16 @@ public class AccountAuthenticationProvider extends AbstractUserDetailsAuthentica
             throw new BadCredentialsException("Credentials may not be null");
         }
         if (!encoder.matches((String) authentication.getCredentials(), userDetails.getPassword())) {
+
             throw new BadCredentialsException("Invalid credentials");
         }
+        log.info("User checking {} {}", userDetails.getUsername(), authentication.getCredentials());
     }
+
 
     @Override
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+        log.info("Retrieve user {}", username);
         return userDetailsService.loadUserByUsername(username);
     }
 }
