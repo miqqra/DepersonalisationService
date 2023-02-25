@@ -23,7 +23,7 @@ public class PersonService {
     }
 
     @Transactional
-    public void addNewPerson(String name){
+    public void addNewPerson(String name) {
         Person person = new Person();
         person.setFirst(name);
         personRepository.save(person);

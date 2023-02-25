@@ -60,8 +60,8 @@ public class PersonController {
         }
     }
 
-    @PostMapping({"/admin/add", "/root/add"})
-    public ResponseEntity<String> addNewPerson(@RequestParam String name) {
+    @PostMapping({"/admin/addName/{name}", "/root/addName/{name}"})
+    public ResponseEntity<String> addNewPersonByName(@RequestParam String name) {
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body("Empty string");
         }
@@ -78,7 +78,7 @@ public class PersonController {
         }
     }
 
-    @PutMapping({"/user/{personId}", "/root/{personId}", "/admin/{personId}"})
+    @PutMapping({"/user/update/{personId}", "/root/update/{personId}", "/admin/update/{personId}"})
     public ResponseEntity<String> updatePerson(@PathVariable Integer personId,
                                                @RequestParam(required = false) String name,
                                                @RequestParam(required = false) String surname,
@@ -115,7 +115,9 @@ public class PersonController {
         }
     }
 
-    @PutMapping({"/user/{personId}", "/root/{personId}", "/admin/{personId}"})
+    @PutMapping({"/user/updatePerson/{personId}",
+            "/root/updatePerson/{personId}",
+            "/admin/updatePerson/{personId}"})
     public ResponseEntity<String> updatePerson(@PathVariable Integer personId,
                                                @RequestBody Person person) {
         personService.updateInfo(personId, person);
