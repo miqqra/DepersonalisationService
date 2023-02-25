@@ -7,51 +7,46 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ru.nsu.backend.security.configurations.filter.CustomAuthFilter;
+import ru.nsu.backend.security.configurations.filter.CustomAuthorizationFilter;
 import ru.nsu.backend.security.role.Roles;
 
-import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity
-public class WebSecurityConfiguration {
+public class WebSecurityConfiguration //implements WebSecurityConfigurerAdapter
+{
     private final AccountAuthenticationProvider authenticationProvider;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeHttpRequests()
+        CustomAuthFilter filter = new CustomAuthFilter(authenticationProvider);
+        filter.setFilterProcessesUrl("/login");
+        http.csrf().disable();
+        http.authorizeHttpRequests()
+
                 .antMatchers("/**/root/**")
-                    .hasRole(Roles._ROOT)
+                .hasRole(Roles._ROOT)
                 .antMatchers("/**/admin/**")
-                    .hasRole(Roles._ADMIN)
+                .hasRole(Roles._ADMIN)
                 .antMatchers("/**/user/**")
-                    .hasRole(Roles._USER)
-                .antMatchers("/**")
-                    .hasRole(Roles._ROOT)
-        ;
-
-
-//                .permitAll()
+                .hasRole(Roles._USER)
+                .antMatchers("/**").hasRole(Roles.USER);
         http
-                .authenticationProvider(authenticationProvider)
-                .httpBasic(withDefaults())
+//                .authenticationProvider(authenticationProvider)
+//                .httpBasic(withDefaults())
                 .sessionManagement()
                 .sessionCreationPolicy(STATELESS);
-//        http
-//                .authorizeHttpRequests()
-//                .antMatchers("/**/root/**").hasRole(Roles.ROOT_)
-//                .antMatchers("/**/admin/**").hasRole(Roles.ADMIN_)
-//                .antMatchers("/**/user/**").hasRole(Roles.USER_)
-//                .anyRequest()
-//                .hasAnyRole(Roles.ROOT)
-//                .and()
-//                .formLogin();
-//
-//        http.authenticationProvider(authenticationProvider).httpBasic(withDefaults()).sessionManagement().sessionCreationPolicy(STATELESS);
+        http.addFilter(filter);
+        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+
 }

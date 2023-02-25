@@ -22,8 +22,9 @@ import java.util.List;
 public class AccountResource {
     private final AppUserService accountService;
 
-    @GetMapping("/root/users")
+    @GetMapping("/users")
     public ResponseEntity<?> getUsers() {
+        System.out.println("WOWOWOWOWO");
         try {
             return ResponseEntity.ok(accountService.getUsers());
         } catch (ResponseException e) {
