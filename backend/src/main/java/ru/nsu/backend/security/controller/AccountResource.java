@@ -79,7 +79,7 @@ public class AccountResource {
     @PostMapping({"/root/roles/delete", "/admin/roles/delete"})
     public ResponseEntity<?> deleteRole(@RequestBody RoleNameForm roleName) {
         try {
-            accountService.deleteRole(roleName.getRoleName());
+            accountService.deleteRole(roleName.getRolename());
             return ResponseEntity.ok("Role " + roleName + " was deleted");
         } catch (ResponseException e) {
             return e.response();
@@ -89,7 +89,7 @@ public class AccountResource {
     @PostMapping({"/root/users/delete", "/admin/users/delete"})
     public ResponseEntity<?> deleteUser(@RequestBody UserNameForm userName) {
         try {
-            accountService.deleteUser(userName.getUserName());
+            accountService.deleteUser(userName.getUsername());
             return ResponseEntity.ok("Role " + userName + " was deleted");
         } catch (ResponseException e) {
             return e.response();
@@ -111,13 +111,13 @@ public class AccountResource {
 @Data
 @ToString
 class RoleNameForm {
-    private String roleName;
+    private String rolename;
 }
 
 @Data
 @ToString
 class UserNameForm {
-    private String userName;
+    private String username;
 }
 
 @Data
