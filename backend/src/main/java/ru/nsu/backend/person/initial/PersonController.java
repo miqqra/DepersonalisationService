@@ -1,8 +1,10 @@
-package ru.nsu.backend.person;
+package ru.nsu.backend.person.initial;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
+import ru.nsu.backend.person.depersonalised.DepersonalisedPersonService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -13,20 +15,21 @@ import java.util.List;
 @AllArgsConstructor
 public class PersonController {
     private final PersonService personService;
+    private final DepersonalisedPersonService depersonalisedPersonService;
+
+    @GetMapping({"/admin/updated", "/root/updated"})
+    public ResponseEntity<List<DepersonalisedPerson>> depersonalisePeople() {
+        return ResponseEntity.ok(depersonalisedPersonService.depersonalisePeople(personService.getInitialData()));
+    }
 
     @GetMapping({"/user/users", "/admin/users", "/root/users"})
-    public ResponseEntity<List<Person>> getUsers() {
+    public ResponseEntity<List<InitialPerson>> getUsers() {
         return ResponseEntity.ok(personService.getPeople());
     }
 
-    @GetMapping({"/admin/updated", "/root/updated"})
-    public ResponseEntity<List<Person>> depersonalisePeople() {
-        return ResponseEntity.ok(personService.depersonalisePeople());
-    }
-
     @GetMapping({"/user/sort", "/admin/sort", "root/sort"})
-    public ResponseEntity<List<Person>> sortTable(@RequestParam String param,
-                                                  @RequestParam SortingType sortingType) {
+    public ResponseEntity<List<InitialPerson>> sortTable(@RequestParam String param,
+                                                         @RequestParam SortingType sortingType) {
         return ResponseEntity.ok(personService.sortTable(param, sortingType));
     }
 
@@ -34,7 +37,7 @@ public class PersonController {
     public ResponseEntity<?> findPerson(@RequestParam String param) {
         try {
             LocalDate localDate = LocalDate.parse(param);
-            Person person = personService.findPerson(localDate);
+            InitialPerson person = personService.findPerson(localDate);
             if (person != null) {
                 return ResponseEntity.ok(person);
             } else {
@@ -43,14 +46,14 @@ public class PersonController {
         } catch (DateTimeParseException e1) {
             try {
                 Integer integer = Integer.parseInt(param);
-                Person person = personService.findPerson(integer);
+                InitialPerson person = personService.findPerson(integer);
                 if (person != null) {
                     return ResponseEntity.ok(person);
                 } else {
                     return ResponseEntity.badRequest().body("Cannot find anything for that request");
                 }
             } catch (NumberFormatException e2) {
-                Person person = personService.findPerson(param);
+                InitialPerson person = personService.findPerson(param);
                 if (person != null) {
                     return ResponseEntity.ok(person);
                 } else {
@@ -70,7 +73,7 @@ public class PersonController {
     }
 
     @PostMapping({"/admin/add", "/root/add"})
-    public ResponseEntity<String> addNewPerson(@RequestBody Person person) {
+    public ResponseEntity<String> addNewPerson(@RequestBody InitialPerson person) {
         if (personService.addNewPerson(person)) {
             return ResponseEntity.ok().body("Person has been added");
         } else {
@@ -119,7 +122,7 @@ public class PersonController {
             "/root/updatePerson/{personId}",
             "/admin/updatePerson/{personId}"})
     public ResponseEntity<String> updatePerson(@PathVariable Integer personId,
-                                               @RequestBody Person person) {
+                                               @RequestBody InitialPerson person) {
         personService.updateInfo(personId, person);
         return ResponseEntity.ok().body("Info has been updated");
     }

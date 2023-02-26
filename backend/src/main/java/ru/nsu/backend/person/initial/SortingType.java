@@ -1,4 +1,4 @@
-package ru.nsu.backend.person;
+package ru.nsu.backend.person.initial;
 
 public enum SortingType {
     ASC(1), DESC(-1);

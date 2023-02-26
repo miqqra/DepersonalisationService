@@ -1,11 +1,11 @@
-package ru.nsu.backend.person;
+package ru.nsu.backend.person.initial;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import ru.nsu.backend.person.Person;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,9 +21,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
 @ToString
-public class Person {
+public class InitialPerson extends Person {
     public static final int PARAMS_COUNT = 15;
 
     @Id
@@ -52,3 +51,4 @@ public class Person {
     private String tin; // taxpayer identification number ИНН
     private String snils; //снилс
 }
+

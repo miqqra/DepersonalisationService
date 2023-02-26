@@ -1,4 +1,4 @@
-package ru.nsu.backend.person;
+package ru.nsu.backend.person.initial;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +13,7 @@ public class PersonConfig {
     @Bean
     CommandLineRunner commandLineRunner(PersonRepository personRepository) {
         return args -> {
-            Person p1 = new Person(
+            InitialPerson p1 = new InitialPerson(
                     1,
                     "surname",
                     "firstName",
@@ -30,7 +30,7 @@ public class PersonConfig {
                     "1234567890",
                     "0987654321"
             );
-            Person p2 = new Person(
+            InitialPerson p2 = new InitialPerson(
                     2,
                     "surname2",
                     "firstName2",
