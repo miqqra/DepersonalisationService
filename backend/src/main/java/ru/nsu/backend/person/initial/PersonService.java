@@ -1,4 +1,4 @@
-package ru.nsu.backend.person;
+package ru.nsu.backend.person.initial;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -18,19 +19,19 @@ public class PersonService {
         this.personRepository = personRepository;
     }
 
-    public List<Person> getPeople() {
+    public List<InitialPerson> getPeople() {
         return personRepository.findAll();
     }
 
     @Transactional
     public void addNewPerson(String name) {
-        Person person = new Person();
+        InitialPerson person = new InitialPerson();
         person.setFirst(name);
         personRepository.save(person);
     }
 
     @Transactional
-    public boolean addNewPerson(Person person) {
+    public boolean addNewPerson(InitialPerson person) {
         if (personRepository.existsById(person.getId()) || personRepository
                 .findBySurAndFirstAndPatronymicAndAgeAndSexAndDobAndSeriesAndNumberAndWhenIssuedAndWhereIssuedAndRegistrationAndWorkAndTinAndSnils(
                         person.getSur(), person.getFirst(), person.getPatronymic(), person.getAge(),
@@ -54,10 +55,6 @@ public class PersonService {
         }
     }
 
-    public List<Person> depersonalisePeople() {
-        return new Depersonalisation(personRepository.findAll()).depersonalise();
-    }
-
     @Transactional
     public boolean updateInfo(Integer personId,
                               String name,
@@ -74,7 +71,7 @@ public class PersonService {
                               String work,
                               String taxpayerIdentificationNumber,
                               String snils) {
-        Person person = personRepository.findById(personId).orElse(null);
+        InitialPerson person = personRepository.findById(personId).orElse(null);
         if (person != null) {
             if (name != null && !name.isEmpty() && !name.isBlank()) {
                 person.setFirst(name);
@@ -137,31 +134,31 @@ public class PersonService {
     }
 
     @Transactional
-    public void updateInfo(Integer personId, Person person) {
+    public void updateInfo(Integer personId, InitialPerson person) {
         person.setId(personId);
-        Person newPerson = personRepository.findById(personId).orElse(person);
+        InitialPerson newPerson = personRepository.findById(personId).orElse(person);
         personRepository.delete(newPerson);
         personRepository.save(person);
     }
 
-    public List<Person> sortTable(String param, SortingType sortingType) {
-        List<Person> people = personRepository.findAll();
-        Comparator<Person> comp = switch (param) {
-            case ("name") -> Comparator.comparing(Person::getFirst);
-            case ("surname") -> Comparator.comparing(Person::getSur);
-            case ("fatherName") -> Comparator.comparing(Person::getPatronymic);
-            case ("age") -> Comparator.comparing(Person::getAge);
-            case ("sex") -> Comparator.comparing(Person::getSex);
-            case ("dateOfBirth") -> Comparator.comparing(Person::getDob);
-            case ("passportSeries") -> Comparator.comparing(Person::getSeries);
-            case ("passportNumber") -> Comparator.comparing(Person::getNumber);
-            case ("wherePassportWasIssued") -> Comparator.comparing(Person::getWhereIssued);
-            case ("whenPassportWasIssued") -> Comparator.comparing(Person::getWhenIssued);
-            case ("registration") -> Comparator.comparing(Person::getRegistration);
-            case ("work") -> Comparator.comparing(Person::getWork);
-            case ("taxpayerIdentificationNumber") -> Comparator.comparing(Person::getTin);
-            case ("snils") -> Comparator.comparing(Person::getSnils);
-            default -> Comparator.comparing(Person::getId);
+    public List<InitialPerson> sortTable(String param, SortingType sortingType) {
+        List<InitialPerson> people = personRepository.findAll();
+        Comparator<InitialPerson> comp = switch (param) {
+            case ("name") -> Comparator.comparing(InitialPerson::getFirst);
+            case ("surname") -> Comparator.comparing(InitialPerson::getSur);
+            case ("fatherName") -> Comparator.comparing(InitialPerson::getPatronymic);
+            case ("age") -> Comparator.comparing(InitialPerson::getAge);
+            case ("sex") -> Comparator.comparing(InitialPerson::getSex);
+            case ("dateOfBirth") -> Comparator.comparing(InitialPerson::getDob);
+            case ("passportSeries") -> Comparator.comparing(InitialPerson::getSeries);
+            case ("passportNumber") -> Comparator.comparing(InitialPerson::getNumber);
+            case ("wherePassportWasIssued") -> Comparator.comparing(InitialPerson::getWhereIssued);
+            case ("whenPassportWasIssued") -> Comparator.comparing(InitialPerson::getWhenIssued);
+            case ("registration") -> Comparator.comparing(InitialPerson::getRegistration);
+            case ("work") -> Comparator.comparing(InitialPerson::getWork);
+            case ("taxpayerIdentificationNumber") -> Comparator.comparing(InitialPerson::getTin);
+            case ("snils") -> Comparator.comparing(InitialPerson::getSnils);
+            default -> Comparator.comparing(InitialPerson::getId);
         };
         if (sortingType == SortingType.ASC) {
             people.sort(comp);
@@ -171,7 +168,7 @@ public class PersonService {
         return people;
     }
 
-    public Person findPerson(String param) {
+    public InitialPerson findOnePerson(String param) {
         return personRepository.findBySur(param).orElse(
                 personRepository.findByFirst(param).orElse(
                         personRepository.findByPatronymic(param).orElse(
@@ -180,7 +177,7 @@ public class PersonService {
                                                 personRepository.findByWork(param).orElse(null))))));
     }
 
-    public Person findPerson(Integer param) {
+    public InitialPerson findOnePerson(Integer param) {
         return personRepository.findByAge(param).orElse(
                 personRepository.findByNumber(param.toString()).orElse(
                         personRepository.findBySeries(param.toString()).orElse(
@@ -192,9 +189,38 @@ public class PersonService {
         );
     }
 
-    public Person findPerson(LocalDate param) {
+    public InitialPerson findOnePerson(LocalDate param) {
         return personRepository.findByWhenIssued(param).orElse(
                 personRepository.findByDob(param).orElse(null)
         );
+    }
+
+    public List<InitialPerson> findPerson(String param){
+        HashSet<InitialPerson> people = new HashSet<>(personRepository.findAllBySur(param));
+        people.addAll(personRepository.findAllByFirst(param));
+        people.addAll(personRepository.findAllByPatronymic(param));
+        people.addAll(personRepository.findAllByWhereIssued(param));
+        people.addAll(personRepository.findAllByRegistration(param));
+        people.addAll(personRepository.findAllByWork(param));
+        return people.stream().toList();
+    }
+
+    public List<InitialPerson> findPerson(Integer param){
+        HashSet<InitialPerson> people = new HashSet<>(personRepository.findAllByAge(param));
+        people.addAll(personRepository.findAllByNumber(param.toString()));
+        people.addAll(personRepository.findAllBySeries(param.toString()));
+        people.addAll(personRepository.findAllByTin(param.toString()));
+        people.addAll(personRepository.findAllBySnils(param.toString()));
+        return people.stream().toList();
+    }
+
+    public List<InitialPerson> findPerson(LocalDate param){
+        HashSet<InitialPerson> people = new HashSet<>(personRepository.findAllByWhenIssued(param));
+        people.addAll(personRepository.findAllByDob(param));
+        return people.stream().toList();
+    }
+
+    public List<InitialPerson> getInitialData() {
+        return personRepository.findAll();
     }
 }
