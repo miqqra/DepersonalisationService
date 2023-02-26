@@ -33,13 +33,14 @@ public class ResponseException extends Exception {
     public static void throwResponse(HttpStatus httpStatus, String reason) throws ResponseException {
         throw new ResponseException(httpStatus, reason);
     }
+    @Data
+    @AllArgsConstructor
+    static public class Response {
+        private HttpStatus status;
+        private String message;
+    }
 }
 
-@Data
-@AllArgsConstructor
-class Response {
-    private HttpStatus status;
-    private String message;
-}
+
 
 

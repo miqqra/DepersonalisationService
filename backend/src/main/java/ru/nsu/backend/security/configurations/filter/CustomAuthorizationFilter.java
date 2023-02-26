@@ -28,9 +28,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("doFilter {}", request.getServletPath());
-        log.info("response {} {}", response.getStatus(), response.getHeaderNames());
         if (request.getServletPath().equals("/login")) {
-            log.info("Standart");
+            log.info("Login {}", request.getHeader("username"));
             filterChain.doFilter(request, response);
         } else {
             String authorizationHeader = request.getHeader(AUTHORIZATION);
@@ -43,26 +42,16 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     DecodedJWT decodedJWT = verifier.verify(token);
                     String username = decodedJWT.getSubject();
                     String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
-                    System.out.println(Arrays.toString(roles));
                     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                     Arrays.stream(roles).forEach(role ->
                             authorities.add(new SimpleGrantedAuthority(role)));
-                    log.info("authorities {} user {}", authorities, username);
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(username, authorities, authorities);
 
-                    log.info("status before setAuth{}", response.getStatus());
-                    System.out.println(authenticationToken);
                     var copy = SecurityContextHolder.getContext();
                     copy.setAuthentication(authenticationToken);
                     SecurityContextHolder.setContext(copy);
-                    System.out.println(SecurityContextHolder.getContext());
-                    log.info("status after setAuth{}", response.getStatus());
-                    System.out.println(SecurityContextHolder.getContext());
                     filterChain.doFilter(request, response);
-                    log.info("Success!");
-                    log.info("Roes {} user {}", roles, username);
-                    System.out.println(response.getStatus());
                 } catch (Exception e) {
                     log.error("Error logging in {}", e.getMessage());
                     response.setHeader("error", e.getMessage());
@@ -76,7 +65,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                             error);
                 }
             } else {
-                log.info("ANOTHER THINGS");
+                log.info("NOT TOKEN AUTHENTICATION");
                 filterChain.doFilter(request, response);
             }
 
