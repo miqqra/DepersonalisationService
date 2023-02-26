@@ -54,6 +54,7 @@ public class DepersonalisedPersonService {
     @Transactional
     public boolean deletePerson(Integer personId) {
         if (depersonalisedPersonRepository.existsById(personId)) {
+
             depersonalisedPersonRepository.deleteById(personId);
             return true;
         } else {

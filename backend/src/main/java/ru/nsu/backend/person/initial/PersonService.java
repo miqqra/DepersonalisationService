@@ -25,8 +25,9 @@ public class PersonService {
 
     @Transactional
     public void addNewPerson(String name) {
-        InitialPerson person = new InitialPerson();
-        person.setFirst(name);
+        InitialPerson person = new InitialPerson(0, name, "", "", 0, 'M',
+                LocalDate.of(0, 1, 1), "", "", "",
+                LocalDate.of(0, 1, 1), "", "", "", "");
         personRepository.save(person);
     }
 
@@ -135,10 +136,21 @@ public class PersonService {
 
     @Transactional
     public void updateInfo(Integer personId, InitialPerson person) {
-        person.setId(personId);
-        InitialPerson newPerson = personRepository.findById(personId).orElse(person);
-        personRepository.delete(newPerson);
-        personRepository.save(person);
+        InitialPerson oldPerson = personRepository.findById(personId).orElse(person);
+        oldPerson.setSur(person.getSur());
+        oldPerson.setFirst(person.getFirst());
+        oldPerson.setPatronymic(person.getPatronymic());
+        oldPerson.setAge(person.getAge());
+        oldPerson.setSex(person.getSex());
+        oldPerson.setDob(person.getDob());
+        oldPerson.setSeries(person.getSeries());
+        oldPerson.setNumber(person.getNumber());
+        oldPerson.setWhereIssued(person.getWhereIssued());
+        oldPerson.setWhenIssued(person.getWhenIssued());
+        oldPerson.setRegistration(person.getRegistration());
+        oldPerson.setWork(person.getWork());
+        oldPerson.setTin(person.getTin());
+        oldPerson.setSnils(person.getSnils());
     }
 
     public List<InitialPerson> sortTable(String param, SortingType sortingType) {
