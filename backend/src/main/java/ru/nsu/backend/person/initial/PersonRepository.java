@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -33,6 +34,32 @@ public interface PersonRepository extends JpaRepository<InitialPerson, Integer> 
     Optional<InitialPerson> findByTin(String tin);
 
     Optional<InitialPerson> findBySnils(String snils);
+
+    List<InitialPerson> findAllBySur(String sur);
+
+    List<InitialPerson> findAllByFirst(String first);
+
+    List<InitialPerson> findAllByPatronymic(String patronymic);
+
+    List<InitialPerson> findAllByAge(int age);
+
+    List<InitialPerson> findAllByDob(LocalDate dob);
+
+    List<InitialPerson> findAllBySeries(String series);
+
+    List<InitialPerson> findAllByNumber(String number);
+
+    List<InitialPerson> findAllByWhereIssued(String whereIssued);
+
+    List<InitialPerson> findAllByWhenIssued(LocalDate whenIssued);
+
+    List<InitialPerson> findAllByRegistration(String registration);
+
+    List<InitialPerson> findAllByWork(String work);
+
+    List<InitialPerson> findAllByTin(String tin);
+
+    List<InitialPerson> findAllBySnils(String snils);
 
     Optional<InitialPerson>
     findBySurAndFirstAndPatronymicAndAgeAndSexAndDobAndSeriesAndNumberAndWhenIssuedAndWhereIssuedAndRegistrationAndWorkAndTinAndSnils(

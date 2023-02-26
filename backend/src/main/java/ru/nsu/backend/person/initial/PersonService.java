@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -167,7 +168,7 @@ public class PersonService {
         return people;
     }
 
-    public InitialPerson findPerson(String param) {
+    public InitialPerson findOnePerson(String param) {
         return personRepository.findBySur(param).orElse(
                 personRepository.findByFirst(param).orElse(
                         personRepository.findByPatronymic(param).orElse(
@@ -176,7 +177,7 @@ public class PersonService {
                                                 personRepository.findByWork(param).orElse(null))))));
     }
 
-    public InitialPerson findPerson(Integer param) {
+    public InitialPerson findOnePerson(Integer param) {
         return personRepository.findByAge(param).orElse(
                 personRepository.findByNumber(param.toString()).orElse(
                         personRepository.findBySeries(param.toString()).orElse(
@@ -188,10 +189,35 @@ public class PersonService {
         );
     }
 
-    public InitialPerson findPerson(LocalDate param) {
+    public InitialPerson findOnePerson(LocalDate param) {
         return personRepository.findByWhenIssued(param).orElse(
                 personRepository.findByDob(param).orElse(null)
         );
+    }
+
+    public List<InitialPerson> findPerson(String param){
+        HashSet<InitialPerson> people = new HashSet<>(personRepository.findAllBySur(param));
+        people.addAll(personRepository.findAllByFirst(param));
+        people.addAll(personRepository.findAllByPatronymic(param));
+        people.addAll(personRepository.findAllByWhereIssued(param));
+        people.addAll(personRepository.findAllByRegistration(param));
+        people.addAll(personRepository.findAllByWork(param));
+        return people.stream().toList();
+    }
+
+    public List<InitialPerson> findPerson(Integer param){
+        HashSet<InitialPerson> people = new HashSet<>(personRepository.findAllByAge(param));
+        people.addAll(personRepository.findAllByNumber(param.toString()));
+        people.addAll(personRepository.findAllBySeries(param.toString()));
+        people.addAll(personRepository.findAllByTin(param.toString()));
+        people.addAll(personRepository.findAllBySnils(param.toString()));
+        return people.stream().toList();
+    }
+
+    public List<InitialPerson> findPerson(LocalDate param){
+        HashSet<InitialPerson> people = new HashSet<>(personRepository.findAllByWhenIssued(param));
+        people.addAll(personRepository.findAllByDob(param));
+        return people.stream().toList();
     }
 
     public List<InitialPerson> getInitialData() {

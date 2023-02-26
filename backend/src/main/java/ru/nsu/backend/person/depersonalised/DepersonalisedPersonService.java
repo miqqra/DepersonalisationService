@@ -10,6 +10,7 @@ import ru.nsu.backend.person.initial.SortingType;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -179,7 +180,7 @@ public class DepersonalisedPersonService {
         return people;
     }
 
-    public DepersonalisedPerson findPerson(String param) {
+    public DepersonalisedPerson findOnePerson(String param) {
         return depersonalisedPersonRepository.findBySur(param).orElse(
                 depersonalisedPersonRepository.findByFirst(param).orElse(
                         depersonalisedPersonRepository.findByPatronymic(param).orElse(
@@ -188,7 +189,7 @@ public class DepersonalisedPersonService {
                                                 depersonalisedPersonRepository.findByWork(param).orElse(null))))));
     }
 
-    public DepersonalisedPerson findPerson(Integer param) {
+    public DepersonalisedPerson findOnePerson(Integer param) {
         return depersonalisedPersonRepository.findByAge(param).orElse(
                 depersonalisedPersonRepository.findByNumber(param.toString()).orElse(
                         depersonalisedPersonRepository.findBySeries(param.toString()).orElse(
@@ -200,9 +201,34 @@ public class DepersonalisedPersonService {
         );
     }
 
-    public DepersonalisedPerson findPerson(LocalDate param) {
+    public DepersonalisedPerson findOnePerson(LocalDate param) {
         return depersonalisedPersonRepository.findByWhenIssued(param).orElse(
                 depersonalisedPersonRepository.findByDob(param).orElse(null)
         );
+    }
+
+    public List<DepersonalisedPerson> findPerson(String param){
+        HashSet<DepersonalisedPerson> people = new HashSet<>(depersonalisedPersonRepository.findAllBySur(param));
+        people.addAll(depersonalisedPersonRepository.findAllByFirst(param));
+        people.addAll(depersonalisedPersonRepository.findAllByPatronymic(param));
+        people.addAll(depersonalisedPersonRepository.findAllByWhereIssued(param));
+        people.addAll(depersonalisedPersonRepository.findAllByRegistration(param));
+        people.addAll(depersonalisedPersonRepository.findAllByWork(param));
+        return people.stream().toList();
+    }
+
+    public List<DepersonalisedPerson> findPerson(Integer param){
+        HashSet<DepersonalisedPerson> people = new HashSet<>(depersonalisedPersonRepository.findAllByAge(param));
+        people.addAll(depersonalisedPersonRepository.findAllByNumber(param.toString()));
+        people.addAll(depersonalisedPersonRepository.findAllBySeries(param.toString()));
+        people.addAll(depersonalisedPersonRepository.findAllByTin(param.toString()));
+        people.addAll(depersonalisedPersonRepository.findAllBySnils(param.toString()));
+        return people.stream().toList();
+    }
+
+    public List<DepersonalisedPerson> findPerson(LocalDate param){
+        HashSet<DepersonalisedPerson> people = new HashSet<>(depersonalisedPersonRepository.findAllByWhenIssued(param));
+        people.addAll(depersonalisedPersonRepository.findAllByDob(param));
+        return people.stream().toList();
     }
 }

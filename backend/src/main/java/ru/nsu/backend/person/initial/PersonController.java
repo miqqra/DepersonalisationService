@@ -17,27 +17,50 @@ public class PersonController {
     private final PersonService personService;
     private final DepersonalisedPersonService depersonalisedPersonService;
 
+    /**
+     * Depersonalise table.
+     *
+     * @return response entity with list of depersonalised people.
+     */
     @GetMapping({"/admin/updated", "/root/updated"})
     public ResponseEntity<List<DepersonalisedPerson>> depersonalisePeople() {
         return ResponseEntity.ok(depersonalisedPersonService.depersonalisePeople(personService.getInitialData()));
     }
 
-    @GetMapping({"/user/users", "/admin/users", "/root/users"})
+    /**
+     * Get all rows of the table.
+     *
+     * @return response entity with list of people info.
+     */
+    @GetMapping({"/admin/users", "/root/users"})
     public ResponseEntity<List<InitialPerson>> getUsers() {
         return ResponseEntity.ok(personService.getPeople());
     }
 
-    @GetMapping({"/user/sort", "/admin/sort", "root/sort"})
+    /**
+     * Sort table by parameter - one of columns name.
+     *
+     * @param param column name.
+     * @param sortingType ascending or descending.
+     * @return response entity with sorted list of people.
+     */
+    @GetMapping({"/admin/sort", "root/sort"})
     public ResponseEntity<List<InitialPerson>> sortTable(@RequestParam String param,
                                                          @RequestParam SortingType sortingType) {
         return ResponseEntity.ok(personService.sortTable(param, sortingType));
     }
 
-    @GetMapping({"/user/find", "/root/find", "/admin/find"})
+    /**
+     * Find person in table.
+     *
+     * @param param what must be in found row.
+     * @return response entity with person object or bad request message.
+     */
+    @GetMapping({"/root/find", "/admin/find"})
     public ResponseEntity<?> findPerson(@RequestParam String param) {
         try {
             LocalDate localDate = LocalDate.parse(param);
-            InitialPerson person = personService.findPerson(localDate);
+            List<InitialPerson> person = personService.findPerson(localDate);
             if (person != null) {
                 return ResponseEntity.ok(person);
             } else {
@@ -46,14 +69,14 @@ public class PersonController {
         } catch (DateTimeParseException e1) {
             try {
                 Integer integer = Integer.parseInt(param);
-                InitialPerson person = personService.findPerson(integer);
+                List<InitialPerson> person = personService.findPerson(integer);
                 if (person != null) {
                     return ResponseEntity.ok(person);
                 } else {
                     return ResponseEntity.badRequest().body("Cannot find anything for that request");
                 }
             } catch (NumberFormatException e2) {
-                InitialPerson person = personService.findPerson(param);
+                List<InitialPerson> person = personService.findPerson(param);
                 if (person != null) {
                     return ResponseEntity.ok(person);
                 } else {
@@ -63,6 +86,12 @@ public class PersonController {
         }
     }
 
+    /**
+     * Add new person to table.
+     *
+     * @param name name of new person.
+     * @return response entity with result - saved or not.
+     */
     @PostMapping({"/admin/addName/{name}", "/root/addName/{name}"})
     public ResponseEntity<String> addNewPersonByName(@RequestParam String name) {
         if (name == null || name.isBlank()) {
@@ -72,6 +101,12 @@ public class PersonController {
         return ResponseEntity.ok().body("Saved");
     }
 
+    /**
+     * Add new person to table.
+     *
+     * @param person new person.
+     * @return response entity with result - saved or not.
+     */
     @PostMapping({"/admin/add", "/root/add"})
     public ResponseEntity<String> addNewPerson(@RequestBody InitialPerson person) {
         if (personService.addNewPerson(person)) {
@@ -81,7 +116,27 @@ public class PersonController {
         }
     }
 
-    @PutMapping({"/user/update/{personId}", "/root/update/{personId}", "/admin/update/{personId}"})
+    /**
+     * Change persons info to param.
+     *
+     * @param personId personId
+     * @param name name.
+     * @param surname surname.
+     * @param fatherName fatherName.
+     * @param age age.
+     * @param sex sex.
+     * @param dateOfBirth dateOfBirth.
+     * @param passportSeries passportSeries.
+     * @param passportNumber passportNumber.
+     * @param wherePassportWasIssued wherePassportWasIssued.
+     * @param whenPassportWasIssued whenPassportWasIssued.
+     * @param registration registration.
+     * @param work work.
+     * @param taxpayerIdentificationNumber taxpayerIdentificationNumber.
+     * @param snils snils.
+     * @return response entity with result - updated or not.
+     */
+    @PutMapping({"/root/update/{personId}", "/admin/update/{personId}"})
     public ResponseEntity<String> updatePerson(@PathVariable Integer personId,
                                                @RequestParam(required = false) String name,
                                                @RequestParam(required = false) String surname,
@@ -118,8 +173,14 @@ public class PersonController {
         }
     }
 
-    @PutMapping({"/user/updatePerson/{personId}",
-            "/root/updatePerson/{personId}",
+    /**
+     * Change persons info to param.
+     *
+     * @param personId personId.
+     * @param person new info about person with personId.
+     * @return response entity with result - updated or not.
+     */
+    @PutMapping({"/root/updatePerson/{personId}",
             "/admin/updatePerson/{personId}"})
     public ResponseEntity<String> updatePerson(@PathVariable Integer personId,
                                                @RequestBody InitialPerson person) {
@@ -127,7 +188,13 @@ public class PersonController {
         return ResponseEntity.ok().body("Info has been updated");
     }
 
-    @DeleteMapping({"/admin/{personId}", "/root/{personId}", "/user/{personId}"})
+    /**
+     * Delete person with personId.
+     *
+     * @param personId personId.
+     * @return response entity with result - deleted or not.
+     */
+    @DeleteMapping({"/admin/{personId}", "/root/{personId}"})
     public ResponseEntity<String> deletePerson(@PathVariable("personId") Integer personId) {
         if (personService.deletePerson(personId)) {
             return ResponseEntity.ok("Person has been deleted");
