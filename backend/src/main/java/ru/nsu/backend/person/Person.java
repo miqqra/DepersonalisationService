@@ -7,16 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 import java.time.LocalDate;
 
-@Entity
-@Table
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -26,16 +18,6 @@ import java.time.LocalDate;
 public class Person {
     public static final int PARAMS_COUNT = 15;
 
-    @Id
-    @SequenceGenerator(
-            name = "person_sequence",
-            sequenceName = "person_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "person_sequence"
-    )
     private int id;
     private String sur; //фамилия
     private String first; //имя
