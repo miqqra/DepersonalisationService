@@ -92,8 +92,8 @@ public class PersonController {
      * @param name name of new person.
      * @return response entity with result - saved or not.
      */
-    @PostMapping({"/admin/addName/{name}", "/root/addName/{name}"})
-    public ResponseEntity<String> addNewPersonByName(@RequestParam String name) {
+    @PostMapping(value = "/root/addName", consumes = "application/json")
+    public ResponseEntity<String> addNewPersonByName(@RequestBody String name) {
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body("Empty string");
         }
@@ -107,7 +107,7 @@ public class PersonController {
      * @param person new person.
      * @return response entity with result - saved or not.
      */
-    @PostMapping({"/admin/add", "/root/add"})
+    @PostMapping(value = "/root/add", consumes = "application/json")
     public ResponseEntity<String> addNewPerson(@RequestBody InitialPerson person) {
         if (personService.addNewPerson(person)) {
             return ResponseEntity.ok().body("Person has been added");
@@ -136,7 +136,7 @@ public class PersonController {
      * @param snils snils.
      * @return response entity with result - updated or not.
      */
-    @PutMapping({"/root/update/{personId}", "/admin/update/{personId}"})
+    @PutMapping("/root/update/{personId}")
     public ResponseEntity<String> updatePerson(@PathVariable Integer personId,
                                                @RequestParam(required = false) String name,
                                                @RequestParam(required = false) String surname,
@@ -180,8 +180,7 @@ public class PersonController {
      * @param person new info about person with personId.
      * @return response entity with result - updated or not.
      */
-    @PutMapping({"/root/updatePerson/{personId}",
-            "/admin/updatePerson/{personId}"})
+    @PutMapping("/root/updatePerson/{personId}")
     public ResponseEntity<String> updatePerson(@PathVariable Integer personId,
                                                @RequestBody InitialPerson person) {
         personService.updateInfo(personId, person);
@@ -194,7 +193,7 @@ public class PersonController {
      * @param personId personId.
      * @return response entity with result - deleted or not.
      */
-    @DeleteMapping({"/admin/{personId}", "/root/{personId}"})
+    @DeleteMapping("/root/{personId}")
     public ResponseEntity<String> deletePerson(@PathVariable("personId") Integer personId) {
         if (personService.deletePerson(personId)) {
             return ResponseEntity.ok("Person has been deleted");

@@ -317,6 +317,7 @@ public class Depersonalisation {
         return result;
     }
 
+    /*
     public static void main(String[] args) {
 
         // permute
@@ -338,4 +339,6 @@ public class Depersonalisation {
             System.out.println(i);
         }
     }
+
+     */
 }
