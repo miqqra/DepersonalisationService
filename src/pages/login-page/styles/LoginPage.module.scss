@@ -1,0 +1,11 @@
+@import "src/styles/_mixins";
+
+.root {
+  min-width: 25%;
+  max-width: 25%;
+}
+
+.form {
+  @include column-center;
+  grid-gap: 20px;
+}

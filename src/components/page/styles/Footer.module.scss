@@ -1,0 +1,19 @@
+@import 'src/styles/_mixins';
+
+.root {
+  @include row-leftmost;
+  width: 100%;
+  padding: 25px;
+  background-color: #222222;
+}
+
+.label {
+  @include row-center;
+  @include center;
+}
+
+.links {
+  @include column-center;
+  padding: 10px;
+}
+
