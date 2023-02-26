@@ -29,6 +29,45 @@ public class Depersonalisation {
     }
 
     /**
+     * The function processes a standard depersonalisation and changes all the dates adding a random number
+     * in range [-dataRange; dataRange].
+     * Passport number and series are changed to equivalent data from 0000 000000 to 9999 999999.
+     *
+     * @param dateRange a random number is selected in the segment, which is added to the original date
+     * @return a depersonalised list with some anonymous data
+     */
+    public List<DepersonalisedPerson> depersonaliseWithRandom(int dateRange) {
+        var personListDepersonalised = depersonalise();
+
+        int passportNum = 0;
+        int passportSeries = 0;
+
+        Random random = new Random();
+
+        for (var person : personListDepersonalised) {
+            person.setDob(
+                person.getDob().plusDays(random.nextInt(-dateRange, dateRange + 1))
+            );
+            person.setWhenIssued(
+                person.getWhenIssued().plusDays(random.nextInt(-dateRange, dateRange + 1))
+            );
+            if (passportNum == 1000000) {
+                passportNum = 0;
+            }
+            if (passportSeries == 10000) {
+                passportSeries = 0;
+            }
+
+            String numberFormatted = String.format("%06d", passportNum++);
+            String seriesFormatted = String.format("%04d", passportSeries++);
+
+            person.setNumber(numberFormatted);
+            person.setSeries(seriesFormatted);
+        }
+        return personListDepersonalised;
+    }
+
+    /**
      * The function takes an original table `sourceData` and
      * permutes its elements in random order.
      *
@@ -295,7 +334,7 @@ public class Depersonalisation {
             System.out.println(i);
         }
         System.out.println("---------------------------------------");
-        for (var i : new Depersonalisation(people).depersonalise()) {
+        for (var i : new Depersonalisation(people).depersonaliseWithRandom(9)) {
             System.out.println(i);
         }
     }
