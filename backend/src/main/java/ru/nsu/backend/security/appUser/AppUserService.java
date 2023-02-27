@@ -253,7 +253,7 @@ public class AppUserService {
     public String getRefreshToken(String username) throws ResponseException {
         log.warn("get user refresh: {}", getUser(username));
         try {
-            log.warn("get user refresh: {}", getUser(username));
+            log.warn("get user {} accessToken", username);
             return getUser(username).getRefresh_token();
         } catch (ResponseException e) {
             log.warn("user not found {}", username);
@@ -264,7 +264,7 @@ public class AppUserService {
     public String getAccessToken(String username) throws ResponseException {
         log.info("user accessToken {}", username);
         try {
-            log.warn("get user accessToken: {}", getUser(username));
+            log.warn("get user {} accessToken", username);
             return getUser(username).getAccess_token();
         } catch (ResponseException e) {
             log.warn("user not found {}", username);

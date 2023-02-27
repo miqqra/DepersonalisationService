@@ -23,6 +23,7 @@ public class AccountAuthenticationProvider extends AbstractUserDetailsAuthentica
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         if (authentication.getCredentials() == null || userDetails.getPassword() == null) {
+            log.warn("Credentials is null");
             throw new BadCredentialsException("Credentials may not be null");
         }
         if (!encoder.matches((String) authentication.getCredentials(), userDetails.getPassword())) {

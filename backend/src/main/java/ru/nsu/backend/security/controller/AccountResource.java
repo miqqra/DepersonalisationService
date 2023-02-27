@@ -98,7 +98,7 @@ public class AccountResource {
     @PostMapping({"/root/roles/delete", "/admin/roles/delete"})
     public ResponseEntity<?> deleteRole(@RequestBody RoleNameForm roleName) {
         try {
-            accountService.deleteRole(roleName.getRolename());
+            accountService.deleteRole(roleName.getRole());
             return ResponseEntity.ok("Role " + roleName + " was deleted");
         } catch (ResponseException e) {
             return e.response();
@@ -139,7 +139,7 @@ public class AccountResource {
                 if (!oldRefreshToken.equals(refresh_token)) {
                     ResponseException.throwResponse(HttpStatus.UNAUTHORIZED, "It's not current refresh token");
                 }
-                String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+//                String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
                 String access_token = JWT.create()
                         .withSubject(user.getUsername())
                         .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
@@ -197,8 +197,9 @@ public class AccountResource {
 @Data
 @ToString
 class RoleNameForm {
-    private String rolename;
+    private String role;
 }
+
 
 @Data
 @ToString
