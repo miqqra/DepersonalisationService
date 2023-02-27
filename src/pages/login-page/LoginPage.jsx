@@ -49,7 +49,7 @@ function LoginPage() {
             label="Пароль"
           />
         </MDBValidationItem>
-        <MDBBtn type="submit" outline color="primary">
+        <MDBBtn type="submit" outline color="dark">
           Войти
         </MDBBtn>
       </MDBValidation>

@@ -22,8 +22,11 @@ function* sagaLoginUser(action) {
       createSuccessToast(`Вы успешно вошли в аккаунт`);
       //TODO redirect the user
     },
-    onAnyError() {
+    onFail403() {
       createErrorToast(`Неверный логин или пароль`);
+    },
+    onAnyError() {
+      createErrorToast(`Ошибка сервера`);
     },
   });
 }

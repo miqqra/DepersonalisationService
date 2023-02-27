@@ -1,5 +1,4 @@
-import { AiFillGitlab } from "react-icons/ai";
-import { BiBoltCircle } from "react-icons/bi";
+import { AiFillGitlab, AiFillTrophy } from "react-icons/ai";
 import styles from "./styles/Footer.module.scss";
 
 function Footer() {
@@ -11,7 +10,7 @@ function Footer() {
         </a>
       </div>
       <div className={styles.label}>
-        <BiBoltCircle color="white" size={70} />
+        <AiFillTrophy color="white" size={70} />
         <h3 style={{ fontSize: "25px", color: "gray" }}>
           Сделано для хакатона Совкомбанка
         </h3>

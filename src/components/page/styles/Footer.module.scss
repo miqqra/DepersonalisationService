@@ -12,6 +12,10 @@
   @include center;
 }
 
+.label h3 {
+  margin: 10px;
+ }
+
 .links {
   @include column-center;
   padding: 10px;
