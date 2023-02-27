@@ -28,6 +28,12 @@ public class AppUser {
     @JsonProperty(access = WRITE_ONLY)
     @NotNull
     private String password;
+
+    @JsonProperty(access = WRITE_ONLY)
+    private String access_token;
+    @JsonProperty(access = WRITE_ONLY)
+    private String refresh_token;
+
     private boolean enabled = true;
     private boolean credentialsexpired = false;
     private boolean expired = false;
@@ -52,8 +58,8 @@ public class AppUser {
     )
 
     private Set<Role> roles;
-    public void removeRole(Role role){
-        roles.remove(role);
 
+    public void removeRole(Role role) {
+        roles.remove(role);
     }
 }

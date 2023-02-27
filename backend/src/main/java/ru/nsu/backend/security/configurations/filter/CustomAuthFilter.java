@@ -3,7 +3,6 @@ package ru.nsu.backend.security.configurations.filter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +14,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.nsu.backend.exceptions.ResponseException;
+import ru.nsu.backend.security.appUser.AppUserService;
+import ru.nsu.backend.security.configurations.CustomSecurityConfig;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -25,10 +26,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@AllArgsConstructor
-
 public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
+
     private final AuthenticationManager authenticationManager;
+
+    private final AppUserService userService;
+
+    public CustomAuthFilter(AuthenticationManager authenticationManager, AppUserService userService) {
+        this.authenticationManager = authenticationManager;
+        this.userService = userService;
+    }
+
+    private final String secretWord = CustomSecurityConfig.secretWord;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
@@ -51,7 +60,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
                         new ResponseException.Response(HttpStatus.FORBIDDEN, "Authentication error"));
             } catch (IOException ignored) {
 
-            } 
+            }
             return null;
         }
 
@@ -65,7 +74,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
                                             Authentication authentication) throws IOException {
 
         User user = (User) authentication.getPrincipal();
-        Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+        Algorithm algorithm = Algorithm.HMAC256(secretWord.getBytes());
         String token = JWT.create()
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
@@ -80,10 +89,17 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
                 .withClaim("roles", user.getAuthorities()
                         .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
+
+        try {
+            userService.updateAccessToken(user.getUsername(), token);
+            userService.updateRefreshToken(user.getUsername(), refresh_token);
+        } catch (ResponseException ignored) {
+
+        }
         response.setHeader("access_token", token);
         response.setHeader("refresh_token", refresh_token);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        log.info("Success with token! {}", user.getUsername());
+        log.info("Success with token {}!", user.getUsername());
         new ObjectMapper().writeValue(response.getOutputStream(),
                 Map.of("access_token", token,
                         "refresh_token", refresh_token));
@@ -91,7 +107,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-        log.warn("!!{} {} {}", request, response, failed);
+        log.warn("Problem with authentication {} {}", request.getRequestURL(), failed.getMessage());
         response.setStatus(403);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         try {
