@@ -121,7 +121,6 @@ public class AppUserService {
 
     public AppUser getUser(String username) throws ResponseException {
         log.info("Getting user {}", username);
-        Roles.mustBeAdmin();
         var user = userRepository.findByUsername(username);
         if (user.isPresent()) {
             return user.get();
@@ -233,4 +232,44 @@ public class AppUserService {
         user.setPassword(encoder.encode(newPassword));
         return user;
     }
+
+    @Transactional
+    public void updateRefreshToken(String username, String refreshToken) throws ResponseException {
+        var user = getUser(username);
+        user.setRefresh_token(refreshToken);
+        log.info("Refresh token updated {}-{}", username, refreshToken);
+//        saveUser(user);
+    }
+
+    @Transactional
+    public void updateAccessToken(String username, String accessToken) throws ResponseException {
+        var user = getUser(username);
+        user.setAccess_token(accessToken);
+        log.info("Access token updated {}-{}", username, accessToken);
+//        saveUser(user);
+
+    }
+
+    public String getRefreshToken(String username) throws ResponseException {
+        log.warn("get user refresh: {}", getUser(username));
+        try {
+            log.warn("get user {} accessToken", username);
+            return getUser(username).getRefresh_token();
+        } catch (ResponseException e) {
+            log.warn("user not found {}", username);
+            throw new ResponseException(HttpStatus.NOT_FOUND, "User not found");
+        }
+    }
+
+    public String getAccessToken(String username) throws ResponseException {
+        log.info("user accessToken {}", username);
+        try {
+            log.warn("get user {} accessToken", username);
+            return getUser(username).getAccess_token();
+        } catch (ResponseException e) {
+            log.warn("user not found {}", username);
+            throw new ResponseException(HttpStatus.NOT_FOUND, "User not found");
+        }
+    }
+
 }
