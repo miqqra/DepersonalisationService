@@ -64,6 +64,7 @@ public class DepersonalisedPersonService {
 
     public List<DepersonalisedPerson> depersonalisePeople(List<InitialPerson> people) {
         List<DepersonalisedPerson> depersonalisedPeople = new Depersonalisation(people).depersonalise();
+        depersonalisedPersonRepository.deleteAll();
         depersonalisedPersonRepository.saveAll(depersonalisedPeople);
         return depersonalisedPeople;
     }

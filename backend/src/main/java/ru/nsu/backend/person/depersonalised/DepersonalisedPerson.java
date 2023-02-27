@@ -27,13 +27,13 @@ public class DepersonalisedPerson extends Person {
 
     @Id
     @SequenceGenerator(
-            name = "person_sequence",
-            sequenceName = "person_sequence",
+            name = "anon_person_sequence",
+            sequenceName = "anon_person_sequence",
             allocationSize = 1
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "person_sequence"
+            generator = "anon_person_sequence"
     )
     private int id;
     private String sur; //фамилия
