@@ -208,13 +208,15 @@ public class PersonService {
     }
 
     public List<InitialPerson> findPerson(String param){
-        HashSet<InitialPerson> people = new HashSet<>(personRepository.findAllBySur(param));
-        people.addAll(personRepository.findAllByFirst(param));
-        people.addAll(personRepository.findAllByPatronymic(param));
-        people.addAll(personRepository.findAllByWhereIssued(param));
-        people.addAll(personRepository.findAllByRegistration(param));
-        people.addAll(personRepository.findAllByWork(param));
-        return people.stream().toList();
+        List<InitialPerson> people = personRepository.findAll();
+        HashSet<InitialPerson> result = new HashSet<>();
+        result.addAll(people.stream().filter(person -> person.getSur().toLowerCase().contains(param)).toList());
+        result.addAll(people.stream().filter(person -> person.getFirst().toLowerCase().contains(param)).toList());
+        result.addAll(people.stream().filter(person -> person.getPatronymic().toLowerCase().contains(param)).toList());
+        result.addAll(people.stream().filter(person -> person.getWhereIssued().toLowerCase().contains(param)).toList());
+        result.addAll(people.stream().filter(person -> person.getRegistration().toLowerCase().contains(param)).toList());
+        result.addAll(people.stream().filter(person -> person.getWork().toLowerCase().contains(param)).toList());
+        return result.stream().toList();
     }
 
     public List<InitialPerson> findPerson(Integer param){

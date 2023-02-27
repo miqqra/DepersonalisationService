@@ -209,13 +209,15 @@ public class DepersonalisedPersonService {
     }
 
     public List<DepersonalisedPerson> findPerson(String param){
-        HashSet<DepersonalisedPerson> people = new HashSet<>(depersonalisedPersonRepository.findAllBySur(param));
-        people.addAll(depersonalisedPersonRepository.findAllByFirst(param));
-        people.addAll(depersonalisedPersonRepository.findAllByPatronymic(param));
-        people.addAll(depersonalisedPersonRepository.findAllByWhereIssued(param));
-        people.addAll(depersonalisedPersonRepository.findAllByRegistration(param));
-        people.addAll(depersonalisedPersonRepository.findAllByWork(param));
-        return people.stream().toList();
+        List<DepersonalisedPerson> people = depersonalisedPersonRepository.findAll();
+        HashSet<DepersonalisedPerson> result = new HashSet<>();
+        result.addAll(people.stream().filter(person -> person.getSur().toLowerCase().contains(param)).toList());
+        result.addAll(people.stream().filter(person -> person.getFirst().toLowerCase().contains(param)).toList());
+        result.addAll(people.stream().filter(person -> person.getPatronymic().toLowerCase().contains(param)).toList());
+        result.addAll(people.stream().filter(person -> person.getWhereIssued().toLowerCase().contains(param)).toList());
+        result.addAll(people.stream().filter(person -> person.getRegistration().toLowerCase().contains(param)).toList());
+        result.addAll(people.stream().filter(person -> person.getWork().toLowerCase().contains(param)).toList());
+        return result.stream().toList();
     }
 
     public List<DepersonalisedPerson> findPerson(Integer param){
