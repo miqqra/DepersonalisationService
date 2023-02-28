@@ -58,6 +58,7 @@ public class AppUser {
     )
 
     private Set<Role> roles;
+    private boolean role_changed;
 
     public void removeRole(Role role) {
         roles.remove(role);

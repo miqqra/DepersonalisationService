@@ -31,10 +31,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("User doesn't exist");
         }
         if (account.getRoles() == null || account.getRoles().isEmpty()) {
+            log.error("User doesn't has role");
             throw new UsernameNotFoundException("User has no roles");
         }
-        log.info("User {} try to connect", username);
-        log.info("Roles: {}", account.getRoles());
+        log.info("User {} try to connect with roles {}", username, account.getRoles());
         Collection<GrantedAuthority> authorities = account.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName())).collect(toList());
         return new User(account.getUsername(), account.getPassword(), account.isEnabled(),

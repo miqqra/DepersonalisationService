@@ -23,12 +23,8 @@ public class AppUserService {
     private final AppUserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
-
-    public AppUser saveUser(AppUser user) throws ResponseException {
-        checkUser(user);
-        log.info("Save new user with name {}", user.getUsername());
-        return userRepository.save(user);
-    }
+    private final WeakHashMap<String, String> aTokenMap = new WeakHashMap<>();
+    private final WeakHashMap<String, AppUser> userCache = new WeakHashMap<>();
 
 
     public Role saveRole(Role role) throws ResponseException {
@@ -69,6 +65,7 @@ public class AppUserService {
         newUser.setRoles(exists);
         newUser.setUsername(userName);
         newUser.setPassword(encoder.encode(password));
+        userCache.put(userName, newUser);
         log.info("Added new user {} with roles {}", userName, roles);
         return userRepository.save(newUser);
     }
@@ -85,7 +82,8 @@ public class AppUserService {
         checkUserName(userName);
         Roles.greaterPermission(roleName);
         log.info("Start adding role {} to user {}", roleName, userName);
-        var user = userRepository.findByUsername(userName);
+
+        var user = findUser(userName);
         if (user.isEmpty()) {
             log.warn("User {} not found", userName);
             throw new ResponseException(HttpStatus.NOT_FOUND, "User not found: " + userName);
@@ -104,7 +102,7 @@ public class AppUserService {
         checkUserName(userName);
         Roles.greaterPermission(roleName);
         log.info("Start delete role {} from user {}", roleName, userName);
-        var user = userRepository.findByUsername(userName);
+        var user = findUser(userName);
         if (user.isEmpty()) {
             log.warn("User {} not found", userName);
             throw new ResponseException(HttpStatus.NOT_FOUND, "User not found: " + userName);
@@ -121,7 +119,7 @@ public class AppUserService {
 
     public AppUser getUser(String username) throws ResponseException {
         log.info("Getting user {}", username);
-        var user = userRepository.findByUsername(username);
+        var user = findUser(username);
         if (user.isPresent()) {
             return user.get();
         } else {
@@ -209,10 +207,11 @@ public class AppUserService {
         if (username == null) {
             ResponseException.throwResponse(HttpStatus.BAD_REQUEST, "There is no username");
         }
+        aTokenMap.remove(username);
         AppUser appUser = getUser(username);
         Roles.greaterPermission(appUser.getRoles());
         appUser.getRoles().clear();
-
+        userCache.remove(username);
         userRepository.deleteByUsername(username);
         log.info("Deleted user {}", username);
     }
@@ -245,6 +244,7 @@ public class AppUserService {
     public void updateAccessToken(String username, String accessToken) throws ResponseException {
         var user = getUser(username);
         user.setAccess_token(accessToken);
+        aTokenMap.put(username, accessToken);
         log.info("Access token updated {}-{}", username, accessToken);
 //        saveUser(user);
 
@@ -263,6 +263,10 @@ public class AppUserService {
 
     public String getAccessToken(String username) throws ResponseException {
         log.info("user accessToken {}", username);
+        String token = aTokenMap.get(username);
+        if (token != null) {
+            return token;
+        }
         try {
             log.warn("get user {} accessToken", username);
             return getUser(username).getAccess_token();
@@ -270,6 +274,22 @@ public class AppUserService {
             log.warn("user not found {}", username);
             throw new ResponseException(HttpStatus.NOT_FOUND, "User not found");
         }
+    }
+
+    private Optional<AppUser> findUser(String userName) {
+        AppUser userTmp = userCache.get(userName);
+        Optional<AppUser> user;
+        if (userTmp != null) {
+            user = Optional.of(userTmp);
+        } else {
+            user = userRepository.findByUsername(userName);
+        }
+        return user;
+    }
+
+    public void clearCache() {
+        aTokenMap.clear();
+        userCache.clear();
     }
 
 }
