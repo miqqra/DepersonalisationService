@@ -13,7 +13,7 @@ function LoginPage() {
   const dispatch = useDispatch();
 
   const [formValue, setFormValue] = useState({
-    login: "",
+    username: "",
     password: "",
   });
 
@@ -21,8 +21,12 @@ function LoginPage() {
     setFormValue({ ...formValue, [e.target.name]: e.target.value });
   };
 
-  const onSubmit = (data) => {
-    dispatch(authorizeUser({ ...data }));
+  const onSubmit = () => {
+    dispatch(
+      authorizeUser({
+        ...formValue,
+      })
+    );
   };
 
   return (
@@ -30,8 +34,8 @@ function LoginPage() {
       <MDBValidation className={styles.form} onSubmit={onSubmit} isValidated>
         <MDBValidationItem feedback="Введите логин" invalid>
           <MDBInput
-            value={formValue.login}
-            name="login"
+            value={formValue.username}
+            name="username"
             onChange={onChange}
             id="loginInput"
             required
