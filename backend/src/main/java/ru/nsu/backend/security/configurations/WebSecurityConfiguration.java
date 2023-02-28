@@ -33,12 +33,12 @@ public class WebSecurityConfiguration //implements WebSecurityConfigurerAdapter
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        if (security.equals("token")){
+        if (security.equals("token")) {
             CustomAuthFilter filter = new CustomAuthFilter(authenticationProvider, appUserService);
             filter.setFilterProcessesUrl("/login");
             http.csrf().disable();
             http.authorizeHttpRequests()
-                    .antMatchers("/accounts/token/refresh").permitAll()
+                    .antMatchers("/accounts/token/refresh", "/accounts/token/info").permitAll()
                     .antMatchers("/**/root/**").hasRole(Roles._ROOT)
                     .antMatchers("/**/admin/**").hasRole(Roles._ADMIN)
                     .antMatchers("/**/user/**").hasRole(Roles._USER)

@@ -59,7 +59,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
                 new ObjectMapper().writeValue(response.getOutputStream(),
                         new ResponseException.Response(HttpStatus.FORBIDDEN, "Authentication error"));
             } catch (IOException ignored) {
-
+                response.setStatus(500);
             }
             return null;
         }
@@ -77,14 +77,14 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
         Algorithm algorithm = Algorithm.HMAC256(secretWord.getBytes());
         String token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 15 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("roles", user.getAuthorities()
                         .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
         String refresh_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 5 * 60 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("roles", user.getAuthorities()
                         .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
@@ -94,7 +94,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
             userService.updateAccessToken(user.getUsername(), token);
             userService.updateRefreshToken(user.getUsername(), refresh_token);
         } catch (ResponseException ignored) {
-
+            response.setStatus(500);
         }
         response.setHeader("access_token", token);
         response.setHeader("refresh_token", refresh_token);
@@ -102,7 +102,10 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
         log.info("Success with token {}!", user.getUsername());
         new ObjectMapper().writeValue(response.getOutputStream(),
                 Map.of("access_token", token,
-                        "refresh_token", refresh_token));
+                        "refresh_token", refresh_token,
+                        "roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toList()),
+                        "username", user.getUsername()));
     }
 
     @Override

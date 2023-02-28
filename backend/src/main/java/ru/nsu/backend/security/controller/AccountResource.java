@@ -49,6 +49,15 @@ public class AccountResource {
         }
     }
 
+    @GetMapping({"/admin/users/info", "/root/users/info"})
+    public ResponseEntity<?> getUserInfo(@RequestBody UserNameForm form) {
+        try {
+            return ResponseEntity.ok(accountService.getUser(form.getUsername()));
+        } catch (ResponseException e) {
+            return e.response();
+        }
+    }
+
     @PostMapping({"/admin/users/create", "/root/users/create"})
     public ResponseEntity<?> createAccount(@RequestBody AppUser account) {
         AppUser newAccount;
@@ -64,6 +73,12 @@ public class AccountResource {
     @GetMapping({"/roles"})
     public ResponseEntity<List<Role>> getRoles() {
         return ResponseEntity.ok(accountService.getRoles());
+    }
+
+    @GetMapping({"/clear/cache"})
+    public ResponseEntity<?> clearCache() {
+        accountService.clearCache();
+        return ResponseEntity.ok("Cache was cleared");
     }
 
     @PostMapping({"/root/users/addrole", "/admin/users/addrole"})
@@ -124,8 +139,70 @@ public class AccountResource {
         }
     }
 
+    @GetMapping("/token/info")
+    public void getInfo(HttpServletRequest request, HttpServletResponse response) {
+        log.info("User trying to refresh token");
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            try {
+                String access_token = authorizationHeader.substring("Bearer ".length());
+                Algorithm algorithm = Algorithm.HMAC256(CustomSecurityConfig.secretWord.getBytes());
+                JWTVerifier verifier = JWT.require(algorithm).build();
+                DecodedJWT decodedJWT = verifier.verify(access_token);
+                String username = decodedJWT.getSubject();
+                AppUser user = accountService.getUser(username);
+                String access_token1 = user.getAccess_token();
+                if (!access_token1.equals(access_token)) {
+                    ResponseException.throwResponse(HttpStatus.UNAUTHORIZED, "It's not current refresh token");
+                }
+
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                log.warn("User {} refresh own tokens", username);
+                new ObjectMapper().writeValue(response.getOutputStream(),
+                        Map.of("username", user.getUsername(),
+                                "roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList())));
+            } catch (ResponseException e) {
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                try {
+                    new ObjectMapper().writeValue(response.getOutputStream(), new ResponseException.Response(e.httpStatus, e.reason));
+                } catch (IOException ex) {
+                    response.setStatus(500);
+                }
+                //return ResponseEntity.badRequest().body("There is no user");
+            } catch (Exception e) {
+                log.error("Error logging with {}", e.getMessage());
+                response.setHeader("error", e.getMessage());
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                Map<String, String> error = new HashMap<>();
+                error.put("error_message", e.getMessage());
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                try {
+                    new ObjectMapper().writeValue(response.getOutputStream(),
+                            error);
+                } catch (IOException ex) {
+                    response.setStatus(500);
+                }
+            }
+        } else {
+            log.info("NOT TOKEN AUTHENTICATION");
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            Map<String, String> error = new HashMap<>();
+            error.put("error_message", "NOT TOKEN AUTHENTICATION");
+            error.put("status", response.getStatus() + "");
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            try {
+                new ObjectMapper().writeValue(response.getOutputStream(),
+                        error);
+            } catch (IOException e) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+            }
+
+        }
+    }
+
     @GetMapping("token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        log.info("User trying to refresh token");
         String authorizationHeader = request.getHeader(AUTHORIZATION);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
@@ -139,7 +216,6 @@ public class AccountResource {
                 if (!oldRefreshToken.equals(refresh_token)) {
                     ResponseException.throwResponse(HttpStatus.UNAUTHORIZED, "It's not current refresh token");
                 }
-//                String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
                 String access_token = JWT.create()
                         .withSubject(user.getUsername())
                         .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
@@ -170,11 +246,9 @@ public class AccountResource {
                 }
                 //return ResponseEntity.badRequest().body("There is no user");
             } catch (Exception e) {
-                log.error("Error logging in {}", e.getMessage());
+                log.error("Error logging with {}", e.getMessage());
                 response.setHeader("error", e.getMessage());
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                //response.sendError(HttpServletResponse.SC_FORBIDDEN);
-
                 Map<String, String> error = new HashMap<>();
                 error.put("error_message", e.getMessage());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -187,7 +261,17 @@ public class AccountResource {
             }
         } else {
             log.info("NOT TOKEN AUTHENTICATION");
-            throw new RuntimeException("Refresh token is missing");
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            Map<String, String> error = new HashMap<>();
+            error.put("error_message", "NOT TOKEN AUTHENTICATION");
+            error.put("status", response.getStatus() + "");
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            try {
+                new ObjectMapper().writeValue(response.getOutputStream(),
+                        error);
+            } catch (IOException e) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+            }
         }
     }
 

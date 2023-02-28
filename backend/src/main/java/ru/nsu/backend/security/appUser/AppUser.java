@@ -30,8 +30,10 @@ public class AppUser {
     private String password;
 
     @JsonProperty(access = WRITE_ONLY)
+    @Column(length=1024)
     private String access_token;
     @JsonProperty(access = WRITE_ONLY)
+    @Column(length=1024)
     private String refresh_token;
 
     private boolean enabled = true;
@@ -58,6 +60,7 @@ public class AppUser {
     )
 
     private Set<Role> roles;
+    private boolean role_changed;
 
     public void removeRole(Role role) {
         roles.remove(role);

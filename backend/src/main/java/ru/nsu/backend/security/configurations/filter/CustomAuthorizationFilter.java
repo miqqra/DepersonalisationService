@@ -38,8 +38,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("doFilter {}", request.getServletPath());
-
+        log.debug("operation {}", request.getServletPath());
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, PATCH, HEAD");
         response.addHeader("Access-Control-Allow-Headers", "username, password, content-type, Origin, Authorization, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
@@ -64,15 +63,19 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(token);
                     String username = decodedJWT.getSubject();
-
                     String oldToken = appUserService.getAccessToken(username);
                     if (oldToken == null) {
                         log.warn("There is no access token for {}", username);
-                        ResponseException.throwResponse(HttpStatus.FORBIDDEN, "There is no access token for you");
+                        ResponseException.throwResponse(HttpStatus.UNAUTHORIZED, "There is no access token for you");
                     }
+                    if (oldToken.equals("")) {
+                        log.warn("There is no access token for {}", username);
+                        ResponseException.throwResponse(HttpStatus.UNAUTHORIZED, "Refresh your token");
+                    }
+
                     if (!oldToken.equals(token)) {
                         log.warn("It's not current access token {}", username);
-                        ResponseException.throwResponse(HttpStatus.FORBIDDEN, "It's not current access token");
+                        ResponseException.throwResponse(HttpStatus.UNAUTHORIZED, "It's not current access token");
                     }
 
                     String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
