@@ -1,11 +1,17 @@
 package ru.nsu.backend.converter;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import ru.nsu.backend.person.Person;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 class TypesConverterTest {
 
     @Test
-    void test() {
+    void testCsv() {
         String jsonData = """
                 [
                   {
@@ -27,7 +33,30 @@ class TypesConverterTest {
                   }
                 ]""";
 
-        System.out.println(TypesConverter.jsonToCsv(jsonData));
+        List<Person> people = new ArrayList<>();
+        people.add(new Person(
+                0,
+                "Соловьёв",
+                "Артемий",
+                "Налимович",
+                37,
+                'M',
+                LocalDate.of(1987, 9, 6),
+                "50 16",
+                "1622837",
+                "ОУФМС Ленинского района гор. Мухосранска в Центральном районе",
+                LocalDate.of(2016, 6, 5),
+                "гор. Зион, ул. Гагарина, д. 56, кв. 15",
+                "Кеша-банк",
+                "517635246978",
+                "517635246978"
+        ));
+
+        String expected = """
+                ID, Surname, Name, Patronymic, Age, Sex, Birthday, Passport series, Passport number, Where issued, When issued, Registration, Work, Taxpayer Identification Number, SNILS
+                0, Соловьёв, Артемий, Налимович, 37, M, 1987-09-06, 50 16, 1622837, ОУФМС Ленинского района гор. Мухосранска в Центральном районе, 2016-06-05, гор. Зион, ул. Гагарина, д. 56, кв. 15, Кеша-банк, 517635246978, 517635246978""";
+
+        Assertions.assertEquals(expected, TypesConverter.toCsv(people));
 
     }
 
