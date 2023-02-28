@@ -3,6 +3,7 @@ package ru.nsu.backend.person.depersonalised;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.nsu.backend.person.Person;
 import ru.nsu.backend.person.initial.Depersonalisation;
 import ru.nsu.backend.person.initial.InitialPerson;
 import ru.nsu.backend.person.initial.SortingType;
@@ -23,7 +24,7 @@ public class DepersonalisedPersonService {
     }
 
     public List<DepersonalisedPerson> getPeople() {
-        return depersonalisedPersonRepository.findAll();
+        return depersonalisedPersonRepository.findAll().stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     @Transactional
@@ -54,7 +55,6 @@ public class DepersonalisedPersonService {
     @Transactional
     public boolean deletePerson(Integer personId) {
         if (depersonalisedPersonRepository.existsById(personId)) {
-
             depersonalisedPersonRepository.deleteById(personId);
             return true;
         } else {
@@ -66,7 +66,7 @@ public class DepersonalisedPersonService {
         List<DepersonalisedPerson> depersonalisedPeople = new Depersonalisation(people).depersonalise();
         depersonalisedPersonRepository.deleteAll();
         depersonalisedPersonRepository.saveAll(depersonalisedPeople);
-        return depersonalisedPeople;
+        return depersonalisedPeople.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     @Transactional
@@ -175,11 +175,10 @@ public class DepersonalisedPersonService {
             default -> Comparator.comparing(DepersonalisedPerson::getId);
         };
         if (sortingType == SortingType.ASC) {
-            people.sort(comp);
+            return people.stream().limit(Person.MAX_PEOPLE_COUNT).sorted(comp).toList();
         } else {
-            people.sort(comp.reversed());
+            return people.stream().limit(Person.MAX_PEOPLE_COUNT).sorted(comp.reversed()).toList();
         }
-        return people;
     }
 
     public DepersonalisedPerson findOnePerson(String param) {
@@ -218,7 +217,7 @@ public class DepersonalisedPersonService {
         result.addAll(people.stream().filter(person -> person.getWhereIssued().toLowerCase().contains(param)).toList());
         result.addAll(people.stream().filter(person -> person.getRegistration().toLowerCase().contains(param)).toList());
         result.addAll(people.stream().filter(person -> person.getWork().toLowerCase().contains(param)).toList());
-        return result.stream().toList();
+        return result.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     public List<DepersonalisedPerson> findPerson(Integer param){
@@ -227,12 +226,12 @@ public class DepersonalisedPersonService {
         people.addAll(depersonalisedPersonRepository.findAllBySeries(param.toString()));
         people.addAll(depersonalisedPersonRepository.findAllByTin(param.toString()));
         people.addAll(depersonalisedPersonRepository.findAllBySnils(param.toString()));
-        return people.stream().toList();
+        return people.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     public List<DepersonalisedPerson> findPerson(LocalDate param){
         HashSet<DepersonalisedPerson> people = new HashSet<>(depersonalisedPersonRepository.findAllByWhenIssued(param));
         people.addAll(depersonalisedPersonRepository.findAllByDob(param));
-        return people.stream().toList();
+        return people.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 }

@@ -16,6 +16,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 @ToString
 public class Person {
+    public static final int MAX_PEOPLE_COUNT = 50;
     public static final int PARAMS_COUNT = 15;
 
     private int id;

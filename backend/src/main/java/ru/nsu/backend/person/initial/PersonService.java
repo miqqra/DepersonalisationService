@@ -3,6 +3,7 @@ package ru.nsu.backend.person.initial;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.nsu.backend.person.Person;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -20,7 +21,7 @@ public class PersonService {
     }
 
     public List<InitialPerson> getPeople() {
-        return personRepository.findAll();
+        return personRepository.findAll().stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     @Transactional
@@ -173,11 +174,10 @@ public class PersonService {
             default -> Comparator.comparing(InitialPerson::getId);
         };
         if (sortingType == SortingType.ASC) {
-            people.sort(comp);
+            return people.stream().limit(Person.MAX_PEOPLE_COUNT).sorted(comp).toList();
         } else {
-            people.sort(comp.reversed());
+            return people.stream().limit(Person.MAX_PEOPLE_COUNT).sorted(comp.reversed()).toList();
         }
-        return people;
     }
 
     public InitialPerson findOnePerson(String param) {
@@ -216,7 +216,7 @@ public class PersonService {
         result.addAll(people.stream().filter(person -> person.getWhereIssued().toLowerCase().contains(param)).toList());
         result.addAll(people.stream().filter(person -> person.getRegistration().toLowerCase().contains(param)).toList());
         result.addAll(people.stream().filter(person -> person.getWork().toLowerCase().contains(param)).toList());
-        return result.stream().toList();
+        return result.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     public List<InitialPerson> findPerson(Integer param){
@@ -225,16 +225,16 @@ public class PersonService {
         people.addAll(personRepository.findAllBySeries(param.toString()));
         people.addAll(personRepository.findAllByTin(param.toString()));
         people.addAll(personRepository.findAllBySnils(param.toString()));
-        return people.stream().toList();
+        return people.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     public List<InitialPerson> findPerson(LocalDate param){
         HashSet<InitialPerson> people = new HashSet<>(personRepository.findAllByWhenIssued(param));
         people.addAll(personRepository.findAllByDob(param));
-        return people.stream().toList();
+        return people.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     public List<InitialPerson> getInitialData() {
-        return personRepository.findAll();
+        return personRepository.findAll().stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 }
