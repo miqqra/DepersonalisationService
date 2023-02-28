@@ -3,6 +3,7 @@ package ru.nsu.backend.security.configurations.filter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -96,6 +97,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     response.setStatus(e.httpStatus.value());
                     new ObjectMapper().writeValue(response.getOutputStream(),
                             new ResponseException.Response(e.httpStatus, e.reason));
+
+                } catch (TokenExpiredException e) {
+                    log.warn("Token expired {}", request.getHeader(AUTHORIZATION).substring("Bearer ".length()));
+                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    new ObjectMapper().writeValue(response.getOutputStream(),
+                            Map.of("message", "try to refresh token"));
                 } catch (Exception e) {
                     log.error("Error logging in {}", e.getMessage());
                     response.setHeader("error", e.getMessage());
