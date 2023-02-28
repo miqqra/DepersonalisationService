@@ -1,5 +1,11 @@
 package ru.nsu.backend.converter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.nsu.backend.person.Person;
 
 import java.util.Arrays;
@@ -14,7 +20,7 @@ public class TypesConverter {
 
         StringJoiner rows = new StringJoiner("\n");
 
-        for(String[] row : matrix) {
+        for (String[] row : matrix) {
             StringJoiner items = new StringJoiner(", ");
             Arrays.stream(row).forEach(items::add);
             rows.add(items.toString());
@@ -24,7 +30,24 @@ public class TypesConverter {
 
     }
 
-    private static String[][] listToMatrix(List<Person> people) {
+    public static @Nullable String toJson(List<Person> people) {
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper
+                .registerModule(new JavaTimeModule())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+        try {
+            return mapper.writeValueAsString(people);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    private static String @NotNull [] @NotNull [] listToMatrix(@NotNull List<Person> people) {
 
         String[][] matrix = new String[people.size() + 1][Person.PARAMS_COUNT];
 
