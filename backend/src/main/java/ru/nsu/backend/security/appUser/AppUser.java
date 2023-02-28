@@ -30,8 +30,10 @@ public class AppUser {
     private String password;
 
     @JsonProperty(access = WRITE_ONLY)
+    @Column(length=1024)
     private String access_token;
     @JsonProperty(access = WRITE_ONLY)
+    @Column(length=1024)
     private String refresh_token;
 
     private boolean enabled = true;

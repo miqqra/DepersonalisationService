@@ -95,6 +95,8 @@ public class AppUserService {
         }
         log.info("Added role {} to user {}", roleName, userName);
         user.get().getRoles().add(role.get());
+        user.get().setAccess_token("");
+        aTokenMap.remove(user.get().getUsername());
         return user.get();
     }
 
@@ -112,9 +114,12 @@ public class AppUserService {
             log.warn("Role {} not found", roleName);
             throw new ResponseException(HttpStatus.NOT_FOUND, "Role not found: " + roleName);
         }
-        user.get().getRoles().remove(role.get());
+        var userR = user.get();
+        userR.getRoles().remove(role.get());
+        userR.setAccess_token("");
+        aTokenMap.remove(userR.getUsername());
         log.info("Deleted role {} from user {}", roleName, userName);
-        return user.get();
+        return userR;
     }
 
     public AppUser getUser(String username) throws ResponseException {
@@ -197,7 +202,14 @@ public class AppUserService {
         }
         Role role = roleRepository.findByName(roleName).get();
         for (AppUser user : getUsers()) {
-            user.removeRole(role);
+            var roles = user.getRoles();
+            if (roles.contains(role)) {
+                user.removeRole(role);
+                user.setAccess_token("");
+                aTokenMap.remove(user.getUsername());
+
+            }
+
         }
         roleRepository.deleteByName(roleName);
         log.info("Deleted role {}", roleName);
@@ -236,14 +248,16 @@ public class AppUserService {
     public void updateRefreshToken(String username, String refreshToken) throws ResponseException {
         var user = getUser(username);
         user.setRefresh_token(refreshToken);
+        log.info("refresh token {}", refreshToken);
         log.info("Refresh token updated {}-{}", username, refreshToken);
-//        saveUser(user);
     }
 
     @Transactional
     public void updateAccessToken(String username, String accessToken) throws ResponseException {
         var user = getUser(username);
+
         user.setAccess_token(accessToken);
+        log.info("access token {}", accessToken);
         aTokenMap.put(username, accessToken);
         log.info("Access token updated {}-{}", username, accessToken);
 //        saveUser(user);

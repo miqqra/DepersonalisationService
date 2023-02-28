@@ -66,11 +66,16 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     String oldToken = appUserService.getAccessToken(username);
                     if (oldToken == null) {
                         log.warn("There is no access token for {}", username);
-                        ResponseException.throwResponse(HttpStatus.FORBIDDEN, "There is no access token for you");
+                        ResponseException.throwResponse(HttpStatus.UNAUTHORIZED, "There is no access token for you");
                     }
+                    if (oldToken.equals("")) {
+                        log.warn("There is no access token for {}", username);
+                        ResponseException.throwResponse(HttpStatus.UNAUTHORIZED, "Refresh your token");
+                    }
+
                     if (!oldToken.equals(token)) {
                         log.warn("It's not current access token {}", username);
-                        ResponseException.throwResponse(HttpStatus.FORBIDDEN, "It's not current access token");
+                        ResponseException.throwResponse(HttpStatus.UNAUTHORIZED, "It's not current access token");
                     }
 
                     String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
