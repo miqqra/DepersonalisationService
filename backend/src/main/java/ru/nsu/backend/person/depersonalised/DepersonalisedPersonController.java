@@ -23,6 +23,18 @@ import java.util.List;
 public class DepersonalisedPersonController {
     private final DepersonalisedPersonService depersonalisedPersonService;
 
+//    @PostMapping({"user/uploadFile", "admin/uploadFile", "root/uploadFile"})
+//    public ResponseEntity<String> uploadFile(@RequestParam String name,
+//                                             @RequestParam MultipartFile file){
+//        depersonalisedPersonService.uploadFile(name, file);
+//        return null;
+//    }
+//
+//    @GetMapping({"user/downloadFile", "admin/downloadFile", "root/downloadFile"})
+//    public MultipartFile downloadFile(){
+//        return depersonalisedPersonService.downloadFile();
+//    }
+
     /**
      * Get all rows of the depersonalised table.
      *

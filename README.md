@@ -90,3 +90,42 @@ For open source projects, say how it is licensed.
 
 ## Project status
 If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+
+
+```
+CREATE DATABASE "person";
+```
+\l - check all databases
+
+### Application.properties for psql build:
+```
+spring.datasource.url=jdbc:postgresql://localhost:5432/person
+spring.datasource.username=postgres
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.format_sql=true
+server.error.include-message=always
+security.type=token
+```
+
+### Build with h2 database(application.properties):
+```
+spring.datasource.url=jdbc:h2:file:/data/sampledata
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=postgres
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+spring.jpa.defer-datasource-initialization=true
+spring.jpa.hibernate.ddl-auto=create-drop
+#spring.jpa.show-sql: true
+server.error.include-message=always
+```
+
+### Build with docker:
+
+```
+docker pull postgres
+```

@@ -3,9 +3,11 @@ package ru.nsu.backend.person.initial;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPersonService;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -16,6 +18,16 @@ import java.util.List;
 public class PersonController {
     private final PersonService personService;
     private final DepersonalisedPersonService depersonalisedPersonService;
+
+    @PostMapping({"/admin/uploadFile", "/root/uploadFile"})
+    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file){
+        return null;
+    }
+
+    @GetMapping({"root/downloadFile", "admin/downloadFile"})
+    public File downloadFile(){
+        return null;
+    }
 
     /**
      * Depersonalise table.
@@ -114,6 +126,18 @@ public class PersonController {
         } else {
             return ResponseEntity.badRequest().body("Person already exists");
         }
+    }
+
+    /**
+     * Change people info.
+     *
+     * @param people list of person with new info from frontend.
+     * @return response result with result - updated.
+     */
+    @PostMapping(value = {"/admin/updatePeople", "/root/updatePeople"}, consumes = "application/json")
+    public ResponseEntity<String> updateInfo(@RequestBody List<InitialPerson> people){
+        people.forEach(person -> personService.updateInfo(person.getId(), person));
+        return ResponseEntity.ok("Updated");
     }
 
     /**

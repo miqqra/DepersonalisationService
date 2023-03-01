@@ -1,13 +1,18 @@
 package ru.nsu.backend.person.depersonalised;
 
+import org.apache.logging.log4j.message.MapMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import ru.nsu.backend.fileutils.FileDownloadUploadUtils;
 import ru.nsu.backend.person.Person;
 import ru.nsu.backend.person.initial.Depersonalisation;
 import ru.nsu.backend.person.initial.InitialPerson;
 import ru.nsu.backend.person.initial.SortingType;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
@@ -233,5 +238,39 @@ public class DepersonalisedPersonService {
         HashSet<DepersonalisedPerson> people = new HashSet<>(depersonalisedPersonRepository.findAllByWhenIssued(param));
         people.addAll(depersonalisedPersonRepository.findAllByDob(param));
         return people.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
+    }
+
+    public boolean downloadFile(MultipartFile file) throws IOException {
+        return false;
+    }
+
+    public boolean uploadJSONFile() throws IOException {
+        FileWriter file;
+        try {
+            file = new FileWriter("C:/output.json");
+        } catch (IOException e){
+            return false;
+        }
+        List<DepersonalisedPerson> people = depersonalisedPersonRepository.findAll();
+        file.write(FileDownloadUploadUtils.serialize(people, MapMessage.MapFormat.XML));
+        file.close();
+        return true;
+    }
+
+    public boolean uploadXMLFile() {
+        FileWriter file;
+        try {
+            file = new FileWriter("C:/output.xml");
+        } catch (IOException e){
+            return false;
+        }
+        List<DepersonalisedPerson> people = depersonalisedPersonRepository.findAll();
+        try{
+            file.write(FileDownloadUploadUtils.serialize(people, MapMessage.MapFormat.XML));
+            file.close();
+        } catch (IOException e){
+            return false;
+        }
+        return true;
     }
 }

@@ -1,10 +1,14 @@
 package ru.nsu.backend.person.initial;
 
+import org.apache.logging.log4j.message.MapMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.nsu.backend.fileutils.FileDownloadUploadUtils;
 import ru.nsu.backend.person.Person;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
@@ -236,5 +240,35 @@ public class PersonService {
 
     public List<InitialPerson> getInitialData() {
         return personRepository.findAll().stream().limit(Person.MAX_PEOPLE_COUNT).toList();
+    }
+
+    public boolean uploadJSONFile() throws IOException {
+        FileWriter file;
+        try {
+            file = new FileWriter("C:/output.json");
+        } catch (IOException e){
+            return false;
+        }
+        List<InitialPerson> people = personRepository.findAll();
+        file.write(FileDownloadUploadUtils.serialize(people, MapMessage.MapFormat.XML));
+        file.close();
+        return true;
+    }
+
+    public boolean uploadXMLFile() {
+        FileWriter file;
+        try {
+            file = new FileWriter("C:/output.xml");
+        } catch (IOException e){
+            return false;
+        }
+        List<InitialPerson> people = personRepository.findAll();
+        try{
+            file.write(FileDownloadUploadUtils.serialize(people, MapMessage.MapFormat.XML));
+            file.close();
+        } catch (IOException e){
+            return false;
+        }
+        return true;
     }
 }
