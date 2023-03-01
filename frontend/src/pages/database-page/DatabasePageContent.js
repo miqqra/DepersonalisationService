@@ -16,6 +16,7 @@ import {
   uploadDepersonalisedUsers,
   uploadUsers,
   synchronizeUsers,
+  downloadXlsx,
 } from "./DatabasePageActions";
 import styles from "./styles/Database.module.scss";
 import LoadingStateBlock from "../../components/loading-state-block/LoadingStateBlock";
@@ -23,7 +24,7 @@ import { getUserRole } from "../../api/Cookie";
 import { useState } from "react";
 import { BiDownload } from "react-icons/bi";
 
-function DBEditor() {
+function DatabasePageContent() {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.databasePage.users);
   const [isDepersonalised, setIsDepersonalised] = useState(
@@ -115,7 +116,12 @@ function DBEditor() {
           Экспорт
         </MDBBtn>
         <MDBDropdown className="btn-group">
-          <MDBBtn size={"sm"} outline color={"dark"}>
+          <MDBBtn
+            onClick={() => dispatch(downloadXlsx)}
+            size={"sm"}
+            outline
+            color={"dark"}
+          >
             <BiDownload size={"20"} />
           </MDBBtn>
           <MDBDropdownToggle
@@ -124,7 +130,9 @@ function DBEditor() {
             color={"dark"}
           ></MDBDropdownToggle>
           <MDBDropdownMenu>
-            <MDBDropdownItem link>XLSX</MDBDropdownItem>
+            <MDBDropdownItem onClick={() => dispatch(downloadXlsx)} link>
+              XLSX
+            </MDBDropdownItem>
             <MDBDropdownItem link>CSV</MDBDropdownItem>
           </MDBDropdownMenu>
         </MDBDropdown>
@@ -161,4 +169,4 @@ function DBEditor() {
   );
 }
 
-export default DBEditor;
+export default DatabasePageContent;

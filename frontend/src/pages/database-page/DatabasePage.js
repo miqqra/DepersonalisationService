@@ -1,9 +1,9 @@
-import DBEditor from "./DBEditor";
+import DatabasePageContent from "./DatabasePageContent";
 
 function DatabasePage() {
   return (
     <>
-      <DBEditor />
+      <DatabasePageContent />
     </>
   );
 }

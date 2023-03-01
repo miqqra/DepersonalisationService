@@ -1,6 +1,7 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { execApiCall } from "../../utils/ApiUtils";
 import {
+  downloadXLSX,
   getDepersonalisedUsers,
   getUsers,
   updatePeople,
@@ -10,14 +11,17 @@ import {
   uploadDepersonalisedUsers,
   uploadUsers,
   synchronizeUsers,
+  downloadXlsx,
 } from "./DatabasePageActions";
 import { updateItems } from "./DatabasePageSlice";
 import { store } from "../../store/Store";
+import { downloadFile } from "../../utils/BrowserUtils";
 
 export function* databasePageSagaWatcher() {
   yield takeEvery(uploadUsers, sagaGetUsers);
   yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
   yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
+  yield takeEvery(downloadXlsx, sagaDownloadXlsx);
 }
 
 function* sagaGetUsers() {
@@ -41,7 +45,7 @@ function* sagaGetDepersonalisedUsers() {
       yield put(updateItems(response.data));
     },
     onAnyError() {
-      createErrorToast(`Что-то пошло не так. Повторите попытку`);
+      createErrorToast(`Что-то пошло не так`);
     },
   });
 }
@@ -54,7 +58,19 @@ function* sagaSynchronizeUsers() {
       createSuccessToast(`Синхронизация данных прошла успешно`);
     },
     onAnyError() {
-      createErrorToast(`Что-то пошло не так. Повторите попытку`);
+      createErrorToast(`Что-то пошло не так`);
+    },
+  });
+}
+
+function* sagaDownloadXlsx() {
+  yield call(execApiCall, {
+    mainCall: () => downloadXLSX(),
+    onSuccess(response) {
+      downloadFile(response.data, "data.xlsx");
+    },
+    onAnyError() {
+      createErrorToast(`Не удалось скачать данные`);
     },
   });
 }
