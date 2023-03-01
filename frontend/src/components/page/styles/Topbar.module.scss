@@ -1,0 +1,7 @@
+@import 'src/styles/_mixins';
+
+.root {
+  @include row-leftmost;
+  padding: 10px;
+  grid-gap: 10px;
+}

@@ -6,7 +6,6 @@ function LoadingStateBlock({ loadingState, children }) {
   let block = null;
 
   if (loadingState.loading === LoadingState.LOADED) {
-    console.log(true);
     block = children;
   } else if (loadingState.loading === LoadingState.LOADING) {
     block = (

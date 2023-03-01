@@ -1,7 +1,9 @@
 @import 'src/styles/_mixins';
 
 .root {
-
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .table_row {
@@ -15,3 +17,23 @@
   grid-gap: 10px;
 }
 
+.outlet {
+  @include row-leftmost;
+  flex-grow: 2;
+}
+
+.table {
+  margin: 10px;
+  overflow: auto;
+}
+
+.database {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.sidebar {
+  @include column-uppermost;
+  padding: 20px;
+}
