@@ -1,4 +1,4 @@
-import { MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
+import { MDBBtn, MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "./DatabasePageSlice";
 import UserData from "../../enums/UserData";
@@ -28,11 +28,11 @@ function DBEditor() {
       <tr key={user.id}>
         <th scope="row">{user.id}</th>
         {columns.map((column, index) => {
+          // noinspection JSUnresolvedVariable
           return (
             <td
               onInput={(event) =>
                 dispatch(
-                  // eslint-disable-next-line no-restricted-globals,no-undef
                   updateUser({
                     id: user.id,
                     key: column,
@@ -54,27 +54,37 @@ function DBEditor() {
 
   return (
     <div>
-      <MDBTable hover>
-        <MDBTableHead>
-          <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Имя</th>
-            <th scope="col">Фамилия</th>
-            <th scope="col">Отчество</th>
-            <th scope="col">Возраст</th>
-            <th scope="col">Пол</th>
-            <th scope="col">Дата рождения</th>
-            <th scope="col">Серия паспорта</th>
-            <th scope="col">Номер паспорта</th>
-            <th scope="col">Кем выдан</th>
-            <th scope="col">Когда выдан</th>
-            <th scope="col">Работа</th>
-            <th scope="col">ИНН</th>
-            <th scope="col">СНИЛС</th>
-          </tr>
-        </MDBTableHead>
-        <MDBTableBody>{usersList}</MDBTableBody>
-      </MDBTable>
+      <div>
+        <div>
+          <MDBBtn>Импорт</MDBBtn>
+          <MDBBtn>Экспорт</MDBBtn>
+          <MDBBtn>Синхронизация</MDBBtn>
+        </div>
+        <div>
+          <MDBTable hover>
+            <MDBTableHead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Имя</th>
+                <th scope="col">Фамилия</th>
+                <th scope="col">Отчество</th>
+                <th scope="col">Возраст</th>
+                <th scope="col">Пол</th>
+                <th scope="col">Дата рождения</th>
+                <th scope="col">Серия паспорта</th>
+                <th scope="col">Номер паспорта</th>
+                <th scope="col">Кем выдан</th>
+                <th scope="col">Когда выдан</th>
+                <th scope="col">Работа</th>
+                <th scope="col">ИНН</th>
+                <th scope="col">СНИЛС</th>
+              </tr>
+            </MDBTableHead>
+            <MDBTableBody>{usersList}</MDBTableBody>
+          </MDBTable>
+        </div>
+      </div>
+      <div>(//TODO sidebar)</div>
     </div>
   );
 }

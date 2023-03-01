@@ -8,7 +8,6 @@ import { updateItems } from "./DatabasePageSlice";
 export function* databasePageSagaWatcher() {
   yield takeEvery(getUsers, sagaGetUsers);
 }
-
 function* sagaGetUsers() {
   yield call(execApiCall, {
     mainCall: () => getUsersRoot(),
