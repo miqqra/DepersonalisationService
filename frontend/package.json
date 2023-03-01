@@ -2,6 +2,11 @@
   "name": "hackathon",
   "version": "0.1.0",
   "private": true,
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
+  },
   "dependencies": {
     "@hookform/error-message": "^2.0.1",
     "@reduxjs/toolkit": "^1.9.3",

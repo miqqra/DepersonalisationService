@@ -5,6 +5,7 @@ import UserData from "../../enums/UserData";
 import { getUsers, synchronizeUsers } from "./DatabasePageActions";
 import styles from "./styles/Database.module.scss";
 import LoadingStateBlock from "../../components/loading-state-block/LoadingStateBlock";
+import {downloadXlsx} from "../../api/ApiCalls";
 
 function DBEditor() {
   const dispatch = useDispatch();
@@ -69,6 +70,9 @@ function DBEditor() {
           color={"dark"}
         >
           Синхронизация
+        </MDBBtn>
+        <MDBBtn download="lol.xlsx" onClick={() => dispatch(downloadXlsx)} color={"dark"}>
+          Скачать xlsx
         </MDBBtn>
       </div>
       <div className={styles}>
