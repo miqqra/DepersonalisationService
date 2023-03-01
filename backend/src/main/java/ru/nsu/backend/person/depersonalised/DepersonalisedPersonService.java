@@ -6,15 +6,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.backend.fileutils.FileDownloadUploadUtils;
+import ru.nsu.backend.person.People;
 import ru.nsu.backend.person.Person;
 import ru.nsu.backend.person.initial.Depersonalisation;
 import ru.nsu.backend.person.initial.InitialPerson;
 import ru.nsu.backend.person.initial.SortingType;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -240,10 +246,6 @@ public class DepersonalisedPersonService {
         return people.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
-    public boolean downloadFile(MultipartFile file) throws IOException {
-        return false;
-    }
-
     public boolean uploadJSONFile() throws IOException {
         FileWriter file;
         try {
@@ -252,9 +254,10 @@ public class DepersonalisedPersonService {
             return false;
         }
         List<DepersonalisedPerson> people = depersonalisedPersonRepository.findAll();
-        file.write(FileDownloadUploadUtils.serialize(people, MapMessage.MapFormat.XML));
+        file.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
         file.close();
         return true;
+        //todo send file
     }
 
     public boolean uploadXMLFile() {
@@ -266,9 +269,43 @@ public class DepersonalisedPersonService {
         }
         List<DepersonalisedPerson> people = depersonalisedPersonRepository.findAll();
         try{
-            file.write(FileDownloadUploadUtils.serialize(people, MapMessage.MapFormat.XML));
+            file.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
             file.close();
         } catch (IOException e){
+            return false;
+        }
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean downloadJSONFile(FileInputStream file){
+        try {
+            List<DepersonalisedPerson> people = (List<DepersonalisedPerson>)
+                    FileDownloadUploadUtils
+                            .deserialize(
+                                    Arrays.toString(file.readAllBytes()),
+                                    MapMessage.MapFormat.JSON)
+                            .getPeople();
+            depersonalisedPersonRepository.deleteAll();
+            depersonalisedPersonRepository.saveAll(people);
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean downloadXMLFile(FileInputStream file){
+        try {
+            List<DepersonalisedPerson> people = (List<DepersonalisedPerson>)
+                    FileDownloadUploadUtils
+                            .deserialize(
+                                    Arrays.toString(file.readAllBytes()),
+                                    MapMessage.MapFormat.XML)
+                            .getPeople();
+            depersonalisedPersonRepository.deleteAll();
+            depersonalisedPersonRepository.saveAll(people);
+        } catch (IOException e) {
             return false;
         }
         return true;

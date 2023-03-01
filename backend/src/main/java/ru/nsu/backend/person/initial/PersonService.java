@@ -5,12 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.backend.fileutils.FileDownloadUploadUtils;
+import ru.nsu.backend.person.People;
 import ru.nsu.backend.person.Person;
+import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -250,7 +254,7 @@ public class PersonService {
             return false;
         }
         List<InitialPerson> people = personRepository.findAll();
-        file.write(FileDownloadUploadUtils.serialize(people, MapMessage.MapFormat.XML));
+        file.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
         file.close();
         return true;
     }
@@ -264,9 +268,43 @@ public class PersonService {
         }
         List<InitialPerson> people = personRepository.findAll();
         try{
-            file.write(FileDownloadUploadUtils.serialize(people, MapMessage.MapFormat.XML));
+            file.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
             file.close();
         } catch (IOException e){
+            return false;
+        }
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean downloadJSONFile(FileInputStream file){
+        try {
+            List<InitialPerson> people = (List<InitialPerson>)
+                    FileDownloadUploadUtils
+                            .deserialize(
+                                    Arrays.toString(file.readAllBytes()),
+                                    MapMessage.MapFormat.JSON)
+                            .getPeople();
+            personRepository.deleteAll();
+            personRepository.saveAll(people);
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean downloadXMLFile(FileInputStream file){
+        try {
+            List<InitialPerson> people = (List<InitialPerson>)
+                    FileDownloadUploadUtils
+                            .deserialize(
+                                    Arrays.toString(file.readAllBytes()),
+                                    MapMessage.MapFormat.XML)
+                            .getPeople();
+            personRepository.deleteAll();
+            personRepository.saveAll(people);
+        } catch (IOException e) {
             return false;
         }
         return true;
