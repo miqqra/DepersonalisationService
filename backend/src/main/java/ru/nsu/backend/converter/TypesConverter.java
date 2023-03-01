@@ -45,35 +45,25 @@ public class TypesConverter {
 
         String[][] matrix = listToMatrix(people);
 
-        Workbook workBook = new XSSFWorkbook();
+        try (Workbook workBook = new XSSFWorkbook();
+             ByteArrayOutputStream fos = new ByteArrayOutputStream()
+        ) {
 
-        Sheet sheet = workBook.createSheet("Sheet");
+            Sheet sheet = workBook.createSheet("Sheet");
 
-        for (int rowIndex = 0; rowIndex < matrix.length; rowIndex++) {
-            Row row = sheet.createRow(rowIndex);
-            for (int cell = 0; cell < matrix[rowIndex].length; cell++) {
-                row.createCell(cell).setCellValue(matrix[rowIndex][cell]);
+            for (int rowIndex = 0; rowIndex < matrix.length; rowIndex++) {
+                Row row = sheet.createRow(rowIndex);
+                for (int cell = 0; cell < matrix[rowIndex].length; cell++) {
+                    row.createCell(cell).setCellValue(matrix[rowIndex][cell]);
+                }
             }
-        }
-        ByteArrayOutputStream fos = new ByteArrayOutputStream();
-        try {
             workBook.write(fos);
+
+            return fos.toByteArray();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        byte[] bytes = fos.toByteArray();
-
-        try {
-            workBook.close();
-            fos.close();
-
-        } catch (IOException e) {
-            System.out.println("Exception While Closing I/O Objects");
-            e.printStackTrace();
-        }
-
-        return bytes;
 
     }
 

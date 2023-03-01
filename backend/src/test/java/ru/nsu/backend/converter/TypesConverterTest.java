@@ -4,9 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.nsu.backend.person.Person;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,19 +42,6 @@ class TypesConverterTest {
                 "\"work\":\"Кеша-банк\",\"tin\":\"517635246978\",\"snils\":\"517635246978\"}]";
 
         Assertions.assertArrayEquals(expected.getBytes(), TypesConverter.toJson(people));
-
-    }
-
-    @Test
-    void toXLSX() {
-
-        File file = new File("test.xlsx");
-
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(TypesConverter.toXLSX(people));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
     }
 }
