@@ -4,33 +4,80 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.opencsv.CSVWriter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.nsu.backend.person.Person;
 
-import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class TypesConverter {
 
-    public static String toCsv(List<Person> people) {
+    public static byte @NotNull [] toCsv(List<Person> people) {
+
+        var matrix = listToMatrix(people);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+
+            try (
+                    Writer writer = new OutputStreamWriter(baos);
+                    CSVWriter csvWriter = new CSVWriter(writer)
+            ) {
+                csvWriter.writeAll(List.of(matrix));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static byte @NotNull [] toXLSX(List<Person> people) {
 
         String[][] matrix = listToMatrix(people);
 
-        StringJoiner rows = new StringJoiner("\n");
+        Workbook workBook = new XSSFWorkbook();
 
-        for (String[] row : matrix) {
-            StringJoiner items = new StringJoiner(", ");
-            Arrays.stream(row).forEach(items::add);
-            rows.add(items.toString());
+        Sheet sheet = workBook.createSheet("Sheet");
+
+        for (int rowIndex = 0; rowIndex < matrix.length; rowIndex++) {
+            Row row = sheet.createRow(rowIndex);
+            for (int cell = 0; cell < matrix[rowIndex].length; cell++) {
+                row.createCell(cell).setCellValue(matrix[rowIndex][cell]);
+            }
+        }
+        ByteArrayOutputStream fos = new ByteArrayOutputStream();
+        try {
+            workBook.write(fos);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        return rows.toString();
+        byte[] bytes = fos.toByteArray();
+
+        try {
+            workBook.close();
+            fos.close();
+
+        } catch (IOException e) {
+            System.out.println("Exception While Closing I/O Objects");
+            e.printStackTrace();
+        }
+
+        return bytes;
 
     }
 
-    public static @Nullable String toJson(List<Person> people) {
+    public static byte @Nullable [] toJson(List<Person> people) {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper
@@ -38,7 +85,7 @@ public class TypesConverter {
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         try {
-            return mapper.writeValueAsString(people);
+            return mapper.writeValueAsBytes(people);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
