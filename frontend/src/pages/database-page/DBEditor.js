@@ -1,15 +1,34 @@
-import { MDBBtn, MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
+import {
+  MDBBtn,
+  MDBDropdown,
+  MDBDropdownItem,
+  MDBDropdownMenu,
+  MDBDropdownToggle,
+  MDBSwitch,
+  MDBTable,
+  MDBTableBody,
+  MDBTableHead,
+} from "mdb-react-ui-kit";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "./DatabasePageSlice";
 import UserData from "../../enums/UserData";
-import { getUsers, synchronizeUsers } from "./DatabasePageActions";
+import {
+  uploadDepersonalisedUsers,
+  uploadUsers,
+  synchronizeUsers,
+} from "./DatabasePageActions";
 import styles from "./styles/Database.module.scss";
 import LoadingStateBlock from "../../components/loading-state-block/LoadingStateBlock";
-import {downloadXlsx} from "../../api/ApiCalls";
+import { getUserRole } from "../../api/Cookie";
+import { useState } from "react";
+import { BiDownload } from "react-icons/bi";
 
 function DBEditor() {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.databasePage.users);
+  const [isDepersonalised, setIsDepersonalised] = useState(
+    getUserRole() === "user"
+  );
 
   const columns = [
     UserData.NAME,
@@ -27,6 +46,26 @@ function DBEditor() {
     UserData.TAX_ID_NUMBER,
     UserData.INIPA,
   ];
+
+  const columnsList = (
+    <tr className={styles.table_row}>
+      <th scope="col">ID</th>
+      <th scope="col">Имя</th>
+      <th scope="col">Фамилия</th>
+      <th scope="col">Отчество</th>
+      <th scope="col">Возраст</th>
+      <th scope="col">Пол</th>
+      <th scope="col">Дата рождения</th>
+      <th scope="col">Серия паспорта</th>
+      <th scope="col">Номер паспорта</th>
+      <th scope="col">Кем выдан</th>
+      <th scope="col">Когда выдан</th>
+      <th scope="col">Регистрация</th>
+      <th scope="col">Работа</th>
+      <th scope="col">ИНН</th>
+      <th scope="col">СНИЛС</th>
+    </tr>
+  );
 
   const usersList = users.value.map((user) => {
     return (
@@ -59,49 +98,63 @@ function DBEditor() {
   });
 
   return (
-    <div>
+    <div className={styles.root}>
       <div className={styles.fetch_buttons}>
-        <MDBBtn onClick={() => dispatch(getUsers)} color={"dark"}>
+        <MDBBtn
+          onClick={() => dispatch(uploadUsers)}
+          color={"dark"}
+          size={"sm"}
+        >
           Импорт
         </MDBBtn>
-        <MDBBtn color={"dark"}>Экспорт</MDBBtn>
         <MDBBtn
-          onClick={() => dispatch(synchronizeUsers(users.value))}
+          onClick={() => dispatch(synchronizeUsers)}
           color={"dark"}
+          size={"sm"}
         >
-          Синхронизация
+          Экспорт
         </MDBBtn>
-        <MDBBtn download="lol.xlsx" onClick={() => dispatch(downloadXlsx)} color={"dark"}>
-          Скачать xlsx
-        </MDBBtn>
+        <MDBDropdown className="btn-group">
+          <MDBBtn size={"sm"} outline color={"dark"}>
+            <BiDownload size={"20"} />
+          </MDBBtn>
+          <MDBDropdownToggle
+            size={"sm"}
+            outline
+            color={"dark"}
+          ></MDBDropdownToggle>
+          <MDBDropdownMenu>
+            <MDBDropdownItem link>XLSX</MDBDropdownItem>
+            <MDBDropdownItem link>CSV</MDBDropdownItem>
+          </MDBDropdownMenu>
+        </MDBDropdown>
       </div>
-      <div className={styles}>
-        <div>
+      <div className={styles.outlet}>
+        <div className={styles.database}>
           <LoadingStateBlock loadingState={users}>
-            <MDBTable hover>
-              <MDBTableHead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Имя</th>
-                  <th scope="col">Фамилия</th>
-                  <th scope="col">Отчество</th>
-                  <th scope="col">Возраст</th>
-                  <th scope="col">Пол</th>
-                  <th scope="col">Дата рождения</th>
-                  <th scope="col">Серия паспорта</th>
-                  <th scope="col">Номер паспорта</th>
-                  <th scope="col">Кем выдан</th>
-                  <th scope="col">Когда выдан</th>
-                  <th scope="col">Регистрация</th>
-                  <th scope="col">Работа</th>
-                  <th scope="col">ИНН</th>
-                  <th scope="col">СНИЛС</th>
-                </tr>
-              </MDBTableHead>
-              <MDBTableBody>{usersList}</MDBTableBody>
-            </MDBTable>
+            <div className={styles.table}>
+              <MDBTable responsive align={"middle"} small hover>
+                <MDBTableHead dark>{columnsList}</MDBTableHead>
+                <MDBTableBody>{usersList}</MDBTableBody>
+              </MDBTable>
+            </div>
+            <div className={styles.sidebar}>
+              <MDBSwitch
+                label={isDepersonalised ? "Деперсонализованная" : "Исходная"}
+                onClick={() => {
+                  if (isDepersonalised) {
+                    dispatch(uploadUsers);
+                  } else {
+                    dispatch(uploadDepersonalisedUsers);
+                  }
+                  setIsDepersonalised(!isDepersonalised);
+                }}
+                defaultChecked={getUserRole() === "user"}
+                disabled={getUserRole() === "user"}
+              />
+              <MDBBtn>Деперсонализовать</MDBBtn>
+            </div>
           </LoadingStateBlock>
-          <div>(//TODO sidebar)</div>
         </div>
       </div>
     </div>

@@ -10,7 +10,9 @@ function Page(props) {
       <div className={styles.outlet}>
         <Outlet />
       </div>
-      <Footer />
+      <div className={styles.footer}>
+        <Footer />
+      </div>
     </div>
   );
 }

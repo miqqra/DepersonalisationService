@@ -1,18 +1,30 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { execApiCall } from "../../utils/ApiUtils";
-import { getUsersRoot, updatePeople } from "../../api/ApiCalls";
+import {
+  getDepersonalisedUsers,
+  getUsers,
+  updatePeople,
+} from "../../api/ApiCalls";
 import { createErrorToast, createSuccessToast } from "../../models/ToastModel";
-import { getUsers, synchronizeUsers } from "./DatabasePageActions";
+import {
+  uploadDepersonalisedUsers,
+  uploadUsers,
+  synchronizeUsers,
+} from "./DatabasePageActions";
 import { updateItems } from "./DatabasePageSlice";
+import { store } from "../../store/Store";
 
 export function* databasePageSagaWatcher() {
-  yield takeEvery(getUsers, sagaGetUsers);
+  yield takeEvery(uploadUsers, sagaGetUsers);
+  yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
   yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
 }
+
 function* sagaGetUsers() {
   yield call(execApiCall, {
-    mainCall: () => getUsersRoot(),
+    mainCall: () => getUsers(),
     *onSuccess(response) {
+      createSuccessToast(`Данные получены`);
       yield put(updateItems(response.data));
     },
     onAnyError() {
@@ -21,9 +33,23 @@ function* sagaGetUsers() {
   });
 }
 
-function* sagaSynchronizeUsers(action) {
+function* sagaGetDepersonalisedUsers() {
   yield call(execApiCall, {
-    mainCall: () => updatePeople(action.payload),
+    mainCall: () => getDepersonalisedUsers(),
+    *onSuccess(response) {
+      createSuccessToast(`Данные получены`);
+      yield put(updateItems(response.data));
+    },
+    onAnyError() {
+      createErrorToast(`Что-то пошло не так. Повторите попытку`);
+    },
+  });
+}
+
+function* sagaSynchronizeUsers() {
+  const users = store.getState().databasePage.users.value;
+  yield call(execApiCall, {
+    mainCall: () => updatePeople(users),
     onSuccess() {
       createSuccessToast(`Синхронизация данных прошла успешно`);
     },

@@ -2,7 +2,11 @@ import { authorizeUser } from "./LoginPageActions";
 import { call, takeEvery } from "redux-saga/effects";
 import { execApiCall } from "../../utils/ApiUtils";
 import { login } from "../../api/ApiCalls";
-import { saveAccessToken, saveRefreshToken } from "../../api/Cookie";
+import {
+  saveAccessToken,
+  saveRefreshToken,
+  saveUserRole,
+} from "../../api/Cookie";
 import { createErrorToast, createSuccessToast } from "../../models/ToastModel";
 import { paths } from "../../routePaths";
 import { redirect } from "../../utils/BrowserUtils";
@@ -20,6 +24,7 @@ function* sagaLoginUser(action) {
   yield call(execApiCall, {
     mainCall: () => login(data),
     onSuccess(response) {
+      saveUserRole(response.data.roles);
       saveAccessToken(response.data.access_token);
       saveRefreshToken(response.data.refresh_token);
       createSuccessToast(`Вы успешно вошли в аккаунт`);

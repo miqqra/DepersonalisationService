@@ -1,4 +1,4 @@
-import { getAccessToken, getRefreshToken } from "./Cookie";
+import { getAccessToken, getRefreshToken, getUserRole } from "./Cookie";
 import { apiAddress } from "./BackendSettings";
 
 const getAccessTokenHeader = () => {
@@ -38,8 +38,24 @@ export async function updateToken() {
   }).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
 }
 
-export async function getUsersRoot() {
-  return fetch(apiAddress + "/root/users", {
+export async function getUsers() {
+  const role = getUserRole();
+  if (role === "user") {
+    return fetch(apiAddress + `/depersonalised/${role}/users`, {
+      method: "GET",
+      headers: getAccessTokenHeader(),
+    }).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
+  } else {
+    return fetch(apiAddress + `/${role}/users`, {
+      method: "GET",
+      headers: getAccessTokenHeader(),
+    }).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
+  }
+}
+
+export async function getDepersonalisedUsers() {
+  const role = getUserRole();
+  return fetch(apiAddress + `/depersonalised/${role}/users`, {
     method: "GET",
     headers: getAccessTokenHeader(),
   }).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
