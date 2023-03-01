@@ -2,12 +2,17 @@ package ru.nsu.backend.person.initial;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPersonService;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -23,20 +28,38 @@ public class PersonController {
     private final String downloadPath;
     @Value("${download.filename}")
     private final String downloadFilename;
-    @Value("${upload.path}")
-    private final String uploadPath;
-    @Value("${upload.filename}")
-    private final String uploadFilename;
 
     @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
-    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file){
-        return null;
+    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file, @RequestBody String format) {
+        try {
+            if (format.equals("json") && personService.downloadJSONFile(file.getInputStream())) {
+                return ResponseEntity.ok("Downloaded");
+            } else if (format.equals("xml") && personService.downloadXMLFile(file.getInputStream())) {
+                return ResponseEntity.ok("Downloaded");
+            } else {
+                return ResponseEntity.badRequest().body("Can not download file");
+            }
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body("Can not download file");
+        }
     }
 
-//    @GetMapping(value = {"root/download", "admin/download"})
-//    public ResponseEntity<Resource> downloadFile(String format) { // format: .xml .json
-//        return new InputStreamResource(new FileInputStream(downloadPath + downloadFilename + ".json"));
-//    }
+    @GetMapping(value = {"root/download", "admin/download"})
+    public ResponseEntity<Resource> downloadFile(@RequestParam String format) { // format: .xml .json
+        File file = new File(downloadPath + downloadFilename + format);
+        if (file.exists() && !file.isDirectory()) {
+            try {
+                if (format.equals("json") && personService.uploadJSONFile(file)) {
+                    return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
+                } else if (format.equals("json") && personService.uploadXMLFile(file)) {
+                    return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
+                } else return ResponseEntity.badRequest().body(null);
+            } catch (IOException e) {
+                return ResponseEntity.internalServerError().body(null);
+            }
+        }
+        return ResponseEntity.internalServerError().body(null);
+    }
 
     /**
      * Depersonalise table.
@@ -46,6 +69,11 @@ public class PersonController {
     @GetMapping({"/admin/updated", "/root/updated"})
     public ResponseEntity<List<DepersonalisedPerson>> depersonalisePeople() {
         return ResponseEntity.ok(depersonalisedPersonService.depersonalisePeople(personService.getInitialData()));
+    }
+
+    @GetMapping(value = "/user/users")
+    public ResponseEntity<List<DepersonalisedPerson>> getUsersByUser(){
+        return ResponseEntity.ok(depersonalisedPersonService.getPeople());
     }
 
     /**
@@ -61,7 +89,7 @@ public class PersonController {
     /**
      * Sort table by parameter - one of columns name.
      *
-     * @param param column name.
+     * @param param       column name.
      * @param sortingType ascending or descending.
      * @return response entity with sorted list of people.
      */
@@ -144,7 +172,7 @@ public class PersonController {
      * @return response result with result - updated.
      */
     @PostMapping(value = {"/admin/updatePeople", "/root/updatePeople"}, consumes = "application/json")
-    public ResponseEntity<String> updateInfo(@RequestBody List<InitialPerson> people){
+    public ResponseEntity<String> updateInfo(@RequestBody List<InitialPerson> people) {
         people.forEach(person -> personService.updateInfo(person.getId(), person));
         return ResponseEntity.ok("Updated");
     }
@@ -152,21 +180,21 @@ public class PersonController {
     /**
      * Change persons info to param.
      *
-     * @param personId personId
-     * @param name name.
-     * @param surname surname.
-     * @param fatherName fatherName.
-     * @param age age.
-     * @param sex sex.
-     * @param dateOfBirth dateOfBirth.
-     * @param passportSeries passportSeries.
-     * @param passportNumber passportNumber.
-     * @param wherePassportWasIssued wherePassportWasIssued.
-     * @param whenPassportWasIssued whenPassportWasIssued.
-     * @param registration registration.
-     * @param work work.
+     * @param personId                     personId
+     * @param name                         name.
+     * @param surname                      surname.
+     * @param fatherName                   fatherName.
+     * @param age                          age.
+     * @param sex                          sex.
+     * @param dateOfBirth                  dateOfBirth.
+     * @param passportSeries               passportSeries.
+     * @param passportNumber               passportNumber.
+     * @param wherePassportWasIssued       wherePassportWasIssued.
+     * @param whenPassportWasIssued        whenPassportWasIssued.
+     * @param registration                 registration.
+     * @param work                         work.
      * @param taxpayerIdentificationNumber taxpayerIdentificationNumber.
-     * @param snils snils.
+     * @param snils                        snils.
      * @return response entity with result - updated or not.
      */
     @PutMapping("/root/update/{personId}")
@@ -210,7 +238,7 @@ public class PersonController {
      * Change persons info to param.
      *
      * @param personId personId.
-     * @param person new info about person with personId.
+     * @param person   new info about person with personId.
      * @return response entity with result - updated or not.
      */
     @PutMapping("/root/updatePerson/{personId}")

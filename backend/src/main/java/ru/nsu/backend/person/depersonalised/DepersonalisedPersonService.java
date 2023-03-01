@@ -4,7 +4,6 @@ import org.apache.logging.log4j.message.MapMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.backend.fileutils.FileDownloadUploadUtils;
 import ru.nsu.backend.person.People;
 import ru.nsu.backend.person.Person;
@@ -13,11 +12,9 @@ import ru.nsu.backend.person.initial.InitialPerson;
 import ru.nsu.backend.person.initial.SortingType;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
@@ -27,6 +24,7 @@ import java.util.List;
 
 @Service
 public class DepersonalisedPersonService {
+
     private final DepersonalisedPersonRepository depersonalisedPersonRepository;
 
     @Autowired
@@ -246,31 +244,24 @@ public class DepersonalisedPersonService {
         return people.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
-    public boolean uploadJSONFile() throws IOException {
-        FileWriter file;
+    public boolean uploadJSONFile(File file) {
         try {
-            file = new FileWriter("C:/output.json");
+            FileWriter fileWriter = new FileWriter(file);
+            List<DepersonalisedPerson> people = depersonalisedPersonRepository.findAll();
+            fileWriter.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.JSON));
+            fileWriter.close();
         } catch (IOException e){
             return false;
         }
-        List<DepersonalisedPerson> people = depersonalisedPersonRepository.findAll();
-        file.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
-        file.close();
         return true;
-        //todo send file
     }
 
-    public boolean uploadXMLFile() {
-        FileWriter file;
+    public boolean uploadXMLFile(File file) {
         try {
-            file = new FileWriter("C:/output.xml");
-        } catch (IOException e){
-            return false;
-        }
-        List<DepersonalisedPerson> people = depersonalisedPersonRepository.findAll();
-        try{
-            file.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
-            file.close();
+            FileWriter fileWriter = new FileWriter(file);
+            List<DepersonalisedPerson> people = depersonalisedPersonRepository.findAll();
+            fileWriter.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
+            fileWriter.close();
         } catch (IOException e){
             return false;
         }
@@ -278,7 +269,7 @@ public class DepersonalisedPersonService {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean downloadJSONFile(FileInputStream file){
+    public boolean downloadJSONFile(InputStream file){
         try {
             List<DepersonalisedPerson> people = (List<DepersonalisedPerson>)
                     FileDownloadUploadUtils
@@ -295,7 +286,7 @@ public class DepersonalisedPersonService {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean downloadXMLFile(FileInputStream file){
+    public boolean downloadXMLFile(InputStream file){
         try {
             List<DepersonalisedPerson> people = (List<DepersonalisedPerson>)
                     FileDownloadUploadUtils
