@@ -19,8 +19,17 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
 
+/**
+ * Provides different formats of people table.
+ */
 public class TypesConverter {
 
+    /**
+     * Provides .csv format of person table.
+     *
+     * @param people source people table
+     * @return bytes array contains csv-format
+     */
     public static byte @NotNull [] toCsv(List<Person> people) {
 
         var matrix = listToMatrix(people);
@@ -41,6 +50,12 @@ public class TypesConverter {
         }
     }
 
+    /**
+     * Provides .xlsx format of person table.
+     *
+     * @param people source people table
+     * @return bytes array contains xlsx-format
+     */
     public static byte @NotNull [] toXLSX(List<Person> people) {
 
         String[][] matrix = listToMatrix(people);
@@ -67,6 +82,12 @@ public class TypesConverter {
 
     }
 
+    /**
+     * Provides .json format of person table.
+     *
+     * @param people source people table
+     * @return bytes array contains json-format
+     */
     public static byte @Nullable [] toJson(List<Person> people) {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -84,6 +105,12 @@ public class TypesConverter {
 
     }
 
+    /**
+     * Converts person list to String matrix.
+     *
+     * @param people source people table
+     * @return matrix of people with headers
+     */
     private static String @NotNull [] @NotNull [] listToMatrix(@NotNull List<Person> people) {
 
         String[][] matrix = new String[people.size() + 1][Person.PARAMS_COUNT];
