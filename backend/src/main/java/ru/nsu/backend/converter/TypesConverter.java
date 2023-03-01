@@ -30,7 +30,7 @@ public class TypesConverter {
      * @param people source people table
      * @return bytes array contains csv-format
      */
-    public static byte @NotNull [] toCsv(List<Person> people) {
+    public static byte @NotNull [] toCsv(List<? extends Person> people) {
 
         var matrix = listToMatrix(people);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -56,7 +56,7 @@ public class TypesConverter {
      * @param people source people table
      * @return bytes array contains xlsx-format
      */
-    public static byte @NotNull [] toXLSX(List<Person> people) {
+    public static byte @NotNull [] toXLSX(List<? extends Person> people) {
 
         String[][] matrix = listToMatrix(people);
 
@@ -88,7 +88,7 @@ public class TypesConverter {
      * @param people source people table
      * @return bytes array contains json-format
      */
-    public static byte @Nullable [] toJson(List<Person> people) {
+    public static byte @Nullable [] toJson(List<? extends Person> people) {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper
@@ -111,7 +111,7 @@ public class TypesConverter {
      * @param people source people table
      * @return matrix of people with headers
      */
-    private static String @NotNull [] @NotNull [] listToMatrix(@NotNull List<Person> people) {
+    private static String @NotNull [] @NotNull [] listToMatrix(@NotNull List<? extends Person> people) {
 
         String[][] matrix = new String[people.size() + 1][Person.PARAMS_COUNT];
 

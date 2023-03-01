@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.nsu.backend.converter.TypesConverter;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPersonService;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -20,13 +20,24 @@ public class PersonController {
     private final DepersonalisedPersonService depersonalisedPersonService;
 
     @PostMapping({"/admin/uploadFile", "/root/uploadFile"})
-    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file){
+    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file) {
         return null;
     }
 
     @GetMapping({"root/downloadFile", "admin/downloadFile"})
-    public File downloadFile(){
-        return null;
+    public ResponseEntity<byte[]> downloadFile(@RequestParam String fileType) {
+        switch (fileType) {
+            case "json" -> {
+                return ResponseEntity.ok(TypesConverter.toJson(personService.getPeople()));
+            }
+            case "csv" -> {
+                return ResponseEntity.ok(TypesConverter.toCsv(personService.getPeople()));
+            }
+            case "xlsx" -> {
+                return ResponseEntity.ok(TypesConverter.toXLSX(personService.getPeople()));
+            }
+        }
+        return ResponseEntity.badRequest().body("Person already exists".getBytes());
     }
 
     /**
@@ -52,7 +63,7 @@ public class PersonController {
     /**
      * Sort table by parameter - one of columns name.
      *
-     * @param param column name.
+     * @param param       column name.
      * @param sortingType ascending or descending.
      * @return response entity with sorted list of people.
      */
@@ -135,7 +146,7 @@ public class PersonController {
      * @return response result with result - updated.
      */
     @PostMapping(value = {"/admin/updatePeople", "/root/updatePeople"}, consumes = "application/json")
-    public ResponseEntity<String> updateInfo(@RequestBody List<InitialPerson> people){
+    public ResponseEntity<String> updateInfo(@RequestBody List<InitialPerson> people) {
         people.forEach(person -> personService.updateInfo(person.getId(), person));
         return ResponseEntity.ok("Updated");
     }
@@ -143,21 +154,21 @@ public class PersonController {
     /**
      * Change persons info to param.
      *
-     * @param personId personId
-     * @param name name.
-     * @param surname surname.
-     * @param fatherName fatherName.
-     * @param age age.
-     * @param sex sex.
-     * @param dateOfBirth dateOfBirth.
-     * @param passportSeries passportSeries.
-     * @param passportNumber passportNumber.
-     * @param wherePassportWasIssued wherePassportWasIssued.
-     * @param whenPassportWasIssued whenPassportWasIssued.
-     * @param registration registration.
-     * @param work work.
+     * @param personId                     personId
+     * @param name                         name.
+     * @param surname                      surname.
+     * @param fatherName                   fatherName.
+     * @param age                          age.
+     * @param sex                          sex.
+     * @param dateOfBirth                  dateOfBirth.
+     * @param passportSeries               passportSeries.
+     * @param passportNumber               passportNumber.
+     * @param wherePassportWasIssued       wherePassportWasIssued.
+     * @param whenPassportWasIssued        whenPassportWasIssued.
+     * @param registration                 registration.
+     * @param work                         work.
      * @param taxpayerIdentificationNumber taxpayerIdentificationNumber.
-     * @param snils snils.
+     * @param snils                        snils.
      * @return response entity with result - updated or not.
      */
     @PutMapping("/root/update/{personId}")
@@ -201,7 +212,7 @@ public class PersonController {
      * Change persons info to param.
      *
      * @param personId personId.
-     * @param person new info about person with personId.
+     * @param person   new info about person with personId.
      * @return response entity with result - updated or not.
      */
     @PutMapping("/root/updatePerson/{personId}")
