@@ -1,13 +1,13 @@
 package ru.nsu.backend.person.initial;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPersonService;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -19,15 +19,24 @@ public class PersonController {
     private final PersonService personService;
     private final DepersonalisedPersonService depersonalisedPersonService;
 
-    @PostMapping({"/admin/uploadFile", "/root/uploadFile"})
+    @Value("${download.path}")
+    private final String downloadPath;
+    @Value("${download.filename}")
+    private final String downloadFilename;
+    @Value("${upload.path}")
+    private final String uploadPath;
+    @Value("${upload.filename}")
+    private final String uploadFilename;
+
+    @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
     public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file){
         return null;
     }
 
-    @GetMapping({"root/downloadFile", "admin/downloadFile"})
-    public File downloadFile(){
-        return null;
-    }
+//    @GetMapping(value = {"root/download", "admin/download"})
+//    public ResponseEntity<Resource> downloadFile(String format) { // format: .xml .json
+//        return new InputStreamResource(new FileInputStream(downloadPath + downloadFilename + ".json"));
+//    }
 
     /**
      * Depersonalise table.
