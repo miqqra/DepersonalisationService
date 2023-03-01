@@ -71,11 +71,6 @@ public class PersonController {
         return ResponseEntity.ok(depersonalisedPersonService.depersonalisePeople(personService.getInitialData()));
     }
 
-    @GetMapping(value = "/user/users")
-    public ResponseEntity<List<DepersonalisedPerson>> getUsersByUser(){
-        return ResponseEntity.ok(depersonalisedPersonService.getPeople());
-    }
-
     /**
      * Get all rows of the table.
      *
