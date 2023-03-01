@@ -5,9 +5,9 @@
 }
 
 .outlet {
-  flex-grow: 100;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  flex-grow: 100;
   overflow: auto;
 }

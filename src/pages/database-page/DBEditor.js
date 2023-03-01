@@ -2,6 +2,9 @@ import { MDBBtn, MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "./DatabasePageSlice";
 import UserData from "../../enums/UserData";
+import { getUsers, synchronizeUsers } from "./DatabasePageActions";
+import styles from "./styles/Database.module.scss";
+import LoadingStateBlock from "../../components/loading-state-block/LoadingStateBlock";
 
 function DBEditor() {
   const dispatch = useDispatch();
@@ -18,6 +21,7 @@ function DBEditor() {
     UserData.PASSPORT_NUMBER,
     UserData.WHERE_PASSPORT_WAS_ISSUED,
     UserData.WHEN_PASSPORT_WAS_ISSUED,
+    UserData.REGISTRATION,
     UserData.OCCUPATION,
     UserData.TAX_ID_NUMBER,
     UserData.INIPA,
@@ -31,6 +35,7 @@ function DBEditor() {
           // noinspection JSUnresolvedVariable
           return (
             <td
+              className={styles.table_row}
               onInput={(event) =>
                 dispatch(
                   updateUser({
@@ -54,37 +59,47 @@ function DBEditor() {
 
   return (
     <div>
-      <div>
+      <div className={styles.fetch_buttons}>
+        <MDBBtn onClick={() => dispatch(getUsers)} color={"dark"}>
+          Импорт
+        </MDBBtn>
+        <MDBBtn color={"dark"}>Экспорт</MDBBtn>
+        <MDBBtn
+          onClick={() => dispatch(synchronizeUsers(users.value))}
+          color={"dark"}
+        >
+          Синхронизация
+        </MDBBtn>
+      </div>
+      <div className={styles}>
         <div>
-          <MDBBtn>Импорт</MDBBtn>
-          <MDBBtn>Экспорт</MDBBtn>
-          <MDBBtn>Синхронизация</MDBBtn>
-        </div>
-        <div>
-          <MDBTable hover>
-            <MDBTableHead>
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Имя</th>
-                <th scope="col">Фамилия</th>
-                <th scope="col">Отчество</th>
-                <th scope="col">Возраст</th>
-                <th scope="col">Пол</th>
-                <th scope="col">Дата рождения</th>
-                <th scope="col">Серия паспорта</th>
-                <th scope="col">Номер паспорта</th>
-                <th scope="col">Кем выдан</th>
-                <th scope="col">Когда выдан</th>
-                <th scope="col">Работа</th>
-                <th scope="col">ИНН</th>
-                <th scope="col">СНИЛС</th>
-              </tr>
-            </MDBTableHead>
-            <MDBTableBody>{usersList}</MDBTableBody>
-          </MDBTable>
+          <LoadingStateBlock loadingState={users}>
+            <MDBTable hover>
+              <MDBTableHead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Имя</th>
+                  <th scope="col">Фамилия</th>
+                  <th scope="col">Отчество</th>
+                  <th scope="col">Возраст</th>
+                  <th scope="col">Пол</th>
+                  <th scope="col">Дата рождения</th>
+                  <th scope="col">Серия паспорта</th>
+                  <th scope="col">Номер паспорта</th>
+                  <th scope="col">Кем выдан</th>
+                  <th scope="col">Когда выдан</th>
+                  <th scope="col">Регистрация</th>
+                  <th scope="col">Работа</th>
+                  <th scope="col">ИНН</th>
+                  <th scope="col">СНИЛС</th>
+                </tr>
+              </MDBTableHead>
+              <MDBTableBody>{usersList}</MDBTableBody>
+            </MDBTable>
+          </LoadingStateBlock>
+          <div>(//TODO sidebar)</div>
         </div>
       </div>
-      <div>(//TODO sidebar)</div>
     </div>
   );
 }

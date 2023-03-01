@@ -10,6 +10,7 @@ const UserData = Object.freeze({
   TAX_ID_NUMBER: "tin",
   WHERE_PASSPORT_WAS_ISSUED: "whereIssued",
   WHEN_PASSPORT_WAS_ISSUED: "whenIssued",
+  REGISTRATION: "registration",
   PASSPORT_NUMBER: "number",
   PASSPORT_SERIES: "series",
   BIRTHDATE: "dob",

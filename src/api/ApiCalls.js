@@ -39,8 +39,16 @@ export async function updateToken() {
 }
 
 export async function getUsersRoot() {
-  return fetch(apiAddress + "/root/updated", {
+  return fetch(apiAddress + "/root/users", {
     method: "GET",
     headers: getAccessTokenHeader(),
   }).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
+}
+
+export async function updatePeople(credentials) {
+  return fetch(apiAddress + `/root/updatePeople`, {
+    method: "POST",
+    headers: getAccessTokenHeader(),
+    body: JSON.stringify(credentials),
+  }).then((r) => ({ status: r.status }));
 }

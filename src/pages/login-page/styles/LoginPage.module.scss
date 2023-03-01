@@ -1,8 +1,13 @@
 @import "src/styles/_mixins";
 
 .root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width: 25%;
   max-width: 25%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .form {

@@ -1,3 +1,17 @@
+@import 'src/styles/_mixins';
+
 .root {
 
 }
+
+.table_row {
+  font-size: small;
+  max-width: fit-content;
+}
+
+.fetch_buttons {
+  @include row-leftmost;
+  padding: 10px;
+  grid-gap: 10px;
+}
+
