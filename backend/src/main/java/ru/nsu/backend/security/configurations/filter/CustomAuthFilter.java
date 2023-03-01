@@ -77,14 +77,14 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
         Algorithm algorithm = Algorithm.HMAC256(secretWord.getBytes());
         String token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 15 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + CustomSecurityConfig.accessTokenLifetime))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("roles", user.getAuthorities()
                         .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
         String refresh_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 48 * 60 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + CustomSecurityConfig.refreshTokenLifetime))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("roles", user.getAuthorities()
                         .stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))

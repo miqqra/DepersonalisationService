@@ -271,17 +271,17 @@ public class AccountResource {
                 AppUser user = accountService.getUser(username);
                 String oldRefreshToken = user.getRefresh_token();
                 if (!oldRefreshToken.equals(refresh_token)) {
-                    ResponseException.throwResponse(HttpStatus.UNAUTHORIZED, "It's not current refresh token");
+                    ResponseException.throwResponse(HttpStatus.FORBIDDEN, "It's not current refresh token");
                 }
                 String access_token = JWT.create()
                         .withSubject(user.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
+                        .withExpiresAt(new Date(System.currentTimeMillis() + CustomSecurityConfig.accessTokenLifetime))
                         .withIssuer(request.getRequestURL().toString())
                         .withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                         .sign(algorithm);
                 String newRefresh_token = JWT.create()
                         .withSubject(user.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + 48 * 60 * 60 * 1000))
+                        .withExpiresAt(new Date(System.currentTimeMillis() + CustomSecurityConfig.refreshTokenLifetime))
                         .withIssuer(request.getRequestURL().toString())
                         .withClaim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                         .sign(algorithm);
@@ -307,7 +307,7 @@ public class AccountResource {
             } catch (Exception e) {
                 log.error("Error logging with {}", e.getMessage());
                 response.setHeader("error", e.getMessage());
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.setStatus(HttpStatus.FORBIDDEN.value());
                 Map<String, String> error = new HashMap<>();
                 error.put("error_message", e.getMessage());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
