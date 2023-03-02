@@ -16,29 +16,13 @@ import {
   uploadDepersonalisedUsers,
   uploadUsers,
   synchronizeUsers,
-  downloadXlsx,
-    downloadCsv,
+  downloadFileType,
 } from "./DatabasePageActions";
 import styles from "./styles/Database.module.scss";
 import LoadingStateBlock from "../../components/loading-state-block/LoadingStateBlock";
 import { getUserRole } from "../../api/Cookie";
 import { useState } from "react";
 import { BiDownload } from "react-icons/bi";
-
-function display(type){
-    let res;
-    switch (type){
-        case "csv":
-            res = downloadCsv;
-            break;
-        case "xlsx":
-            res = downloadXlsx;
-            break;
-        default:
-            res = "csv"
-    }
-    return res;
-}
 
 function DatabasePageContent() {
   const dispatch = useDispatch();
@@ -133,7 +117,7 @@ function DatabasePageContent() {
                 </MDBBtn>
                 <MDBDropdown className="btn-group">
                     <MDBBtn
-                        onClick={() => dispatch(display(type))}
+                        onClick={() => dispatch(downloadFileType(type))}
                         size={"sm"}
                         outline
                         color={"dark"}
@@ -146,11 +130,14 @@ function DatabasePageContent() {
                         color={"dark"}
                     ></MDBDropdownToggle>
                     <MDBDropdownMenu>
-                        <MDBDropdownItem onClick={() => type = "xlsx"} link>
+                        <MDBDropdownItem onClick={() => dispatch(downloadFileType(type = "xlsx"))} link>
                             XLSX
                         </MDBDropdownItem>
-                        <MDBDropdownItem onClick={() => type = "csv"} link>
+                        <MDBDropdownItem onClick={() => dispatch(downloadFileType(type = "csv"))} link>
                             CSV
+                        </MDBDropdownItem>
+                        <MDBDropdownItem onClick={() => dispatch(downloadFileType(type = "json"))} link>
+                            JSON
                         </MDBDropdownItem>
                     </MDBDropdownMenu>
                 </MDBDropdown>

@@ -69,20 +69,11 @@ export async function updatePeople(credentials) {
   }).then((r) => ({ status: r.status }));
 }
 
-export async function downloadXLSX() {
-  return fetch(apiAddress + "/root/downloadFile?fileType=xlsx", {
+export async function downloadSpecificType(filetype) {
+  return fetch(apiAddress + "/root/downloadFile?fileType=" + filetype, {
     method: "GET",
     headers: getAccessTokenHeader(),
   }).then((r) =>
     r.arrayBuffer().then((data) => ({ status: r.status, data: data }))
-  );
-}
-
-export async function downloadCSV() {
-  return fetch(apiAddress + "/root/downloadFile?fileType=csv", {
-    method: "GET",
-    headers: getAccessTokenHeader(),
-  }).then((r) =>
-      r.arrayBuffer().then((data) => ({ status: r.status, data: data }))
   );
 }

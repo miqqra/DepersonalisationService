@@ -1,19 +1,17 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { execApiCall } from "../../utils/ApiUtils";
 import {
-  downloadXLSX,
+  downloadSpecificType,
   getDepersonalisedUsers,
   getUsers,
   updatePeople,
-    downloadCSV,
 } from "../../api/ApiCalls";
 import { createErrorToast, createSuccessToast } from "../../models/ToastModel";
 import {
   uploadDepersonalisedUsers,
   uploadUsers,
   synchronizeUsers,
-  downloadXlsx,
-    downloadCsv
+  downloadFileType,
 } from "./DatabasePageActions";
 import { updateItems } from "./DatabasePageSlice";
 import { store } from "../../store/Store";
@@ -23,8 +21,7 @@ export function* databasePageSagaWatcher() {
     yield takeEvery(uploadUsers, sagaGetUsers);
     yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
     yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
-    yield takeEvery(downloadXlsx, sagaDownloadXlsx);
-    yield takeEvery(downloadCsv ,sagaDownloadCSV);
+    yield takeEvery(downloadFileType, sagaDownloadFile);
 }
 
 function* sagaGetUsers() {
@@ -66,26 +63,15 @@ function* sagaSynchronizeUsers() {
   });
 }
 
-function* sagaDownloadXlsx() {
+function* sagaDownloadFile(filetype) {
+  console.log(filetype)
   yield call(execApiCall, {
-    mainCall: () => downloadXLSX(),
+    mainCall: () => downloadSpecificType(filetype.payload),
     onSuccess(response) {
-      downloadFile(response.data, "data.xlsx");
+      downloadFile(response.data, "data." + filetype.payload);
     },
     onAnyError() {
       createErrorToast(`Не удалось скачать данные`);
     },
   });
-}
-
-function* sagaDownloadCSV() {
-    yield call(execApiCall, {
-        mainCall: () => downloadCSV(),
-        onSuccess(response) {
-            downloadFile(response.data, "data.csv");
-        },
-        onAnyError() {
-            createErrorToast(`Не удалось скачать данные csv`);
-        },
-    });
 }
