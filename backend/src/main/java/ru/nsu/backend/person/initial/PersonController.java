@@ -25,10 +25,10 @@ public class PersonController {
     private final PersonService personService;
     private final DepersonalisedPersonService depersonalisedPersonService;
 
-    @Value("${download.path}")
-    private final String downloadPath;
-    @Value("${download.filename}")
-    private final String downloadFilename;
+//    @Value("${download.path}")
+//    private final String downloadPath;
+//    @Value("${download.filename}")
+//    private final String downloadFilename;
 
 //    @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
 //    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file, @RequestBody String format) {

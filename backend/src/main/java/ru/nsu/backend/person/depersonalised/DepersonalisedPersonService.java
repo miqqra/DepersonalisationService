@@ -33,7 +33,8 @@ public class DepersonalisedPersonService {
     }
 
     public List<DepersonalisedPerson> getPeople() {
-        return depersonalisedPersonRepository.findAll().stream().limit(Person.MAX_PEOPLE_COUNT).toList();
+        Comparator<DepersonalisedPerson> comp = Comparator.comparing(DepersonalisedPerson::getId);
+        return depersonalisedPersonRepository.findAll().stream().sorted(comp).limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     @Transactional
@@ -72,7 +73,7 @@ public class DepersonalisedPersonService {
     }
 
     public List<DepersonalisedPerson> depersonalisePeople(List<InitialPerson> people) {
-        List<DepersonalisedPerson> depersonalisedPeople = new Depersonalisation(people).depersonalise();
+        List<DepersonalisedPerson> depersonalisedPeople = new Depersonalisation(people).depersonaliseWithRandom(10);
         depersonalisedPersonRepository.deleteAll();
         depersonalisedPersonRepository.saveAll(depersonalisedPeople);
         return depersonalisedPeople.stream().limit(Person.MAX_PEOPLE_COUNT).toList();

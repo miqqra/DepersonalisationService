@@ -30,10 +30,10 @@ import java.util.List;
 public class DepersonalisedPersonController {
     private final DepersonalisedPersonService depersonalisedPersonService;
 
-    @Value("${download.path}")
-    private final String downloadPath;
-    @Value("${download.filename}")
-    private final String downloadFilename;
+//    @Value("${download.path}")
+//    private final String downloadPath;
+//    @Value("${download.filename}")
+//    private final String downloadFilename;
 
     @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
     public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file, @RequestBody String format) {
@@ -50,22 +50,22 @@ public class DepersonalisedPersonController {
         }
     }
 
-    @GetMapping(value = {"root/download", "admin/download"})
-    public ResponseEntity<Resource> downloadFile(@RequestParam String format) { // format: .xml .json
-        File file = new File(downloadPath + downloadFilename + format);
-        if (file.exists() && !file.isDirectory()) {
-            try {
-                if (format.equals("json") && depersonalisedPersonService.uploadJSONFile(file)) {
-                    return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
-                } else if (format.equals("json") && depersonalisedPersonService.uploadXMLFile(file)) {
-                    return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
-                } else return ResponseEntity.badRequest().body(null);
-            } catch (IOException e) {
-                return ResponseEntity.internalServerError().body(null);
-            }
-        }
-        return ResponseEntity.internalServerError().body(null);
-    }
+//    @GetMapping(value = {"root/download", "admin/download"})
+//    public ResponseEntity<Resource> downloadFile(@RequestParam String format) { // format: .xml .json
+//        File file = new File(downloadPath + downloadFilename + format);
+//        if (file.exists() && !file.isDirectory()) {
+//            try {
+//                if (format.equals("json") && depersonalisedPersonService.uploadJSONFile(file)) {
+//                    return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
+//                } else if (format.equals("json") && depersonalisedPersonService.uploadXMLFile(file)) {
+//                    return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
+//                } else return ResponseEntity.badRequest().body(null);
+//            } catch (IOException e) {
+//                return ResponseEntity.internalServerError().body(null);
+//            }
+//        }
+//        return ResponseEntity.internalServerError().body(null);
+//    }
 
     /**
      * Get all rows of the depersonalised table.

@@ -29,7 +29,8 @@ public class PersonService {
     }
 
     public List<InitialPerson> getPeople() {
-        return personRepository.findAll().stream().limit(Person.MAX_PEOPLE_COUNT).toList();
+        Comparator<InitialPerson> comp = Comparator.comparing(InitialPerson::getId);
+        return personRepository.findAll().stream().sorted(comp).limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     @Transactional
