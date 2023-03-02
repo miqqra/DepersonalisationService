@@ -1,7 +1,7 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { execApiCall } from "../../utils/ApiUtils";
 import {
-  downloadXLSX,
+  downloadSpecificType,
   getDepersonalisedUsers,
   getUsers,
   updateDepersonalised,
@@ -13,7 +13,7 @@ import {
   uploadDepersonalisedUsers,
   uploadUsers,
   synchronizeUsers,
-  downloadXlsx,
+  downloadFileType,
   depersonaliseUsers,
   searchUsers,
 } from "./DatabasePageActions";
@@ -25,9 +25,12 @@ export function* databasePageSagaWatcher() {
   yield takeEvery(uploadUsers, sagaGetUsers);
   yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
   yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
-  yield takeEvery(downloadXlsx, sagaDownloadXlsx);
   yield takeEvery(depersonaliseUsers, sagaDepersonaliseUsers);
   yield takeEvery(searchUsers, sagaSearchUsers);
+    yield takeEvery(uploadUsers, sagaGetUsers);
+    yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
+    yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
+    yield takeEvery(downloadFileType, sagaDownloadFile);
 }
 
 function* sagaGetUsers() {
@@ -69,11 +72,12 @@ function* sagaSynchronizeUsers() {
   });
 }
 
-function* sagaDownloadXlsx() {
+function* sagaDownloadFile(filetype) {
+  console.log(filetype)
   yield call(execApiCall, {
-    mainCall: () => downloadXLSX(),
+    mainCall: () => downloadSpecificType(filetype.payload),
     onSuccess(response) {
-      downloadFile(response.data, "data.xlsx");
+      downloadFile(response.data, "data." + filetype.payload);
     },
     onAnyError() {
       createErrorToast(`Не удалось скачать данные`);

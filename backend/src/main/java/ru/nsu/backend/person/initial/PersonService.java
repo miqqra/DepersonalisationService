@@ -7,11 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.backend.fileutils.FileDownloadUploadUtils;
 import ru.nsu.backend.person.People;
 import ru.nsu.backend.person.Person;
-import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
@@ -29,7 +29,8 @@ public class PersonService {
     }
 
     public List<InitialPerson> getPeople() {
-        return personRepository.findAll().stream().limit(Person.MAX_PEOPLE_COUNT).toList();
+        Comparator<InitialPerson> comp = Comparator.comparing(InitialPerson::getId);
+        return personRepository.findAll().stream().sorted(comp).limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
     @Transactional
@@ -246,30 +247,24 @@ public class PersonService {
         return personRepository.findAll().stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
 
-    public boolean uploadJSONFile() throws IOException {
-        FileWriter file;
+    public boolean uploadJSONFile(File file) {
         try {
-            file = new FileWriter("C:/output.json");
+            FileWriter fileWriter = new FileWriter(file);
+            List<InitialPerson> people = personRepository.findAll();
+            fileWriter.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.JSON));
+            fileWriter.close();
         } catch (IOException e){
             return false;
         }
-        List<InitialPerson> people = personRepository.findAll();
-        file.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
-        file.close();
         return true;
     }
 
-    public boolean uploadXMLFile() {
-        FileWriter file;
+    public boolean uploadXMLFile(File file) {
         try {
-            file = new FileWriter("C:/output.xml");
-        } catch (IOException e){
-            return false;
-        }
-        List<InitialPerson> people = personRepository.findAll();
-        try{
-            file.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
-            file.close();
+            FileWriter fileWriter = new FileWriter(file);
+            List<InitialPerson> people = personRepository.findAll();
+            fileWriter.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
+            fileWriter.close();
         } catch (IOException e){
             return false;
         }
@@ -277,7 +272,7 @@ public class PersonService {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean downloadJSONFile(FileInputStream file){
+    public boolean downloadJSONFile(InputStream file){
         try {
             List<InitialPerson> people = (List<InitialPerson>)
                     FileDownloadUploadUtils
@@ -294,7 +289,7 @@ public class PersonService {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean downloadXMLFile(FileInputStream file){
+    public boolean downloadXMLFile(InputStream file){
         try {
             List<InitialPerson> people = (List<InitialPerson>)
                     FileDownloadUploadUtils

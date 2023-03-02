@@ -1,6 +1,9 @@
 package ru.nsu.backend.person.depersonalised;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,8 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.backend.person.initial.SortingType;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -23,16 +30,41 @@ import java.util.List;
 public class DepersonalisedPersonController {
     private final DepersonalisedPersonService depersonalisedPersonService;
 
-//    @PostMapping({"user/uploadFile", "admin/uploadFile", "root/uploadFile"})
-//    public ResponseEntity<String> uploadFile(@RequestParam String name,
-//                                             @RequestParam MultipartFile file){
-//        depersonalisedPersonService.uploadFile(name, file);
-//        return null;
-//    }
-//
-//    @GetMapping({"user/downloadFile", "admin/downloadFile", "root/downloadFile"})
-//    public MultipartFile downloadFile(){
-//        return depersonalisedPersonService.downloadFile();
+//    @Value("${download.path}")
+//    private final String downloadPath;
+//    @Value("${download.filename}")
+//    private final String downloadFilename;
+
+    @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
+    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file, @RequestBody String format) {
+        try {
+            if (format.equals("json") && depersonalisedPersonService.downloadJSONFile(file.getInputStream())) {
+                return ResponseEntity.ok("Downloaded");
+            } else if (format.equals("xml") && depersonalisedPersonService.downloadXMLFile(file.getInputStream())) {
+                return ResponseEntity.ok("Downloaded");
+            } else {
+                return ResponseEntity.badRequest().body("Can not download file");
+            }
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body("Can not download file");
+        }
+    }
+
+//    @GetMapping(value = {"root/download", "admin/download"})
+//    public ResponseEntity<Resource> downloadFile(@RequestParam String format) { // format: .xml .json
+//        File file = new File(downloadPath + downloadFilename + format);
+//        if (file.exists() && !file.isDirectory()) {
+//            try {
+//                if (format.equals("json") && depersonalisedPersonService.uploadJSONFile(file)) {
+//                    return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
+//                } else if (format.equals("json") && depersonalisedPersonService.uploadXMLFile(file)) {
+//                    return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
+//                } else return ResponseEntity.badRequest().body(null);
+//            } catch (IOException e) {
+//                return ResponseEntity.internalServerError().body(null);
+//            }
+//        }
+//        return ResponseEntity.internalServerError().body(null);
 //    }
 
     /**
@@ -84,7 +116,8 @@ public class DepersonalisedPersonController {
                     return ResponseEntity.badRequest().body("Cannot find anything for that request");
                 }
             } catch (NumberFormatException e2) {
-                List<DepersonalisedPerson> depersonalisedPerson = depersonalisedPersonService.findPerson(param);
+                List<DepersonalisedPerson> depersonalisedPerson = depersonalisedPersonService
+                        .findPerson(param.toLowerCase());
                 if (depersonalisedPerson != null) {
                     return ResponseEntity.ok(depersonalisedPerson);
                 } else {

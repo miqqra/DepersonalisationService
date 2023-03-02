@@ -68,8 +68,8 @@ export async function updatePeople(credentials) {
   }).then((r) => ({ status: r.status }));
 }
 
-export async function downloadXLSX() {
-  return fetch(apiAddress + "/root/downloadFile?fileType=xlsx", {
+export async function downloadSpecificType(filetype) {
+  return fetch(apiAddress + "/root/downloadFile?fileType=" + filetype, {
     method: "GET",
     headers: getAccessTokenHeader(),
   }).then((r) =>
