@@ -7,12 +7,9 @@
 
 ### Docker
 
-Установите [Docker](https://www.docker.com/). 
-Загрузите контейнер Postgresql с помощью команды
-```docker run —name postgresDB -p 5455:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=person -d postgres```
-Таким образом, база данных будет доступна на localhost:5455
+```docker build --file=backend/backend.dockerfile  -t playground-web-backend .```
 
-Загрузите Backend и Frontend в отдельные контейнеры и запустите.
+```docker build --file=frontend/frontend.dockerfile  -t playground-web-frontend .```
 
 ### С помощью IntelliJ IDEA
 
@@ -47,7 +44,7 @@ spring.jpa.properties.hibernate.format_sql=true
 ```
 
 Для использования `postgresql` добавьте в `build.gradle` в блок `dependencies` зависимость
-```runtimeOnly 'org.postgresql:postgresql'```
+```runtimeOnly 'org.postgresql:postgresql'```.
 
 Для запуска фронтенда перейдите на сайт скачивания [Node.js](https://nodejs.org/en/download/).
 После скачивания зайдите в IntelliJ IDEA в папку frontend и в терминале напишите команды
@@ -79,7 +76,7 @@ spring.jpa.properties.hibernate.format_sql=true
 Кнопка `Импорт` отвечает за загрузку таблицы с сервера.
 Кнопка `Экспорт` отвечает за загрузку обновленных данных на сервер.
 
-Есть возможность сортировки таблицу по выбранному параметру, поиск по написанному слову и выгрузка таблицы из сайта, 
+Есть возможность сортировки таблицы по выбранному параметру, поиск по написанному слову и выгрузка таблицы из сайта, 
 формат файла можно выбрать самостоятельно.
 Кнопка деперсонализации загружает новую обезличенную таблицу, которая также может быть редактируема.
 
