@@ -1,19 +1,12 @@
 package ru.nsu.backend.person.initial;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.backend.converter.TypesConverter;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPersonService;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -58,7 +51,7 @@ public class PersonController {
                 return ResponseEntity.ok(TypesConverter.toXLSX(personService.getPeople()));
             }
         }
-        return ResponseEntity.badRequest().body("Person already exists".getBytes());
+        return ResponseEntity.badRequest().body("Can't download file".getBytes());
     }
 
     /**
@@ -186,7 +179,7 @@ public class PersonController {
      * @return response result with result - updated.
      */
     @PostMapping(value = {"/admin/updatePeople", "/root/updatePeople"}, consumes = "application/json")
-    public ResponseEntity<String> updateInfo(@RequestBody List<InitialPerson> people){
+    public ResponseEntity<String> updateInfo(@RequestBody List<InitialPerson> people) {
         people.forEach(person -> personService.updateInfo(person.getId(), person));
         return ResponseEntity.ok("Updated");
     }
