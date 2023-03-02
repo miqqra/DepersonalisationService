@@ -100,3 +100,23 @@ export async function uploadSearchedUsers(param) {
     }
   ).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
 }
+
+export async function uploadFile(file){
+  let data = new FormData()
+  data.append('file', file.body)
+  // data.append('format', 'json')
+  // console.log(file.body.type);
+  return fetch(
+      `${apiAddress}/${getUserRole()}/uploadFile`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+          // "Content-Type": "multipart/form-data",
+          // "Content-Type": "application/json",
+        },
+        body: data
+      }
+  ).then(r => r.json())
+      .then(r => console.log(r))
+}

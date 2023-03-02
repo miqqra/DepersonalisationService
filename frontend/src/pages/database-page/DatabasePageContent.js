@@ -3,7 +3,7 @@ import {
   MDBDropdown,
   MDBDropdownItem,
   MDBDropdownMenu,
-  MDBDropdownToggle,
+  MDBDropdownToggle, MDBFile,
   MDBInput,
   MDBInputGroup,
   MDBSwitch,
@@ -20,13 +20,13 @@ import {
   synchronizeUsers,
   depersonaliseUsers,
   searchUsers,
-  downloadFileType,
+  downloadFileType, uploadFileType,
 } from "./DatabasePageActions";
 import styles from "./styles/Database.module.scss";
 import LoadingStateBlock from "../../components/loading-state-block/LoadingStateBlock";
-import { getUserRole } from "../../api/Cookie";
-import { useState } from "react";
-import { BiDownload, BiSearch } from "react-icons/bi";
+import {getAccessToken, getUserRole} from "../../api/Cookie";
+import {useRef, useState} from "react";
+import {BiCloudUpload, BiDownload, BiSearch} from "react-icons/bi";
 
 function DatabasePageContent() {
   const dispatch = useDispatch();
@@ -103,6 +103,36 @@ function DatabasePageContent() {
     );
   });
 
+  function SelectFileButton() {
+
+    const fileInput = useRef();
+    const selectFile = () => {
+      fileInput.current.click();
+    }
+
+    return (
+        <div>
+          <input
+              type="file"
+              style={{ "display": "none" }}
+              ref={fileInput}
+              onChange={(e) => {
+                console.log(e.target.files[0])
+                return dispatch(uploadFileType(e.target.files[0]))
+              }}
+          />
+          <MDBBtn
+              onClick={selectFile}
+              size={"sm"}
+              outline
+              color={"dark"}
+          >
+            <BiCloudUpload size={"20"} />
+          </MDBBtn>
+        </div>
+    )
+  }
+
   return (
     <div className={styles.root}>
       <div className={styles.fetch_buttons}>
@@ -157,6 +187,32 @@ function DatabasePageContent() {
             >
               JSON
             </MDBDropdownItem>
+          </MDBDropdownMenu>
+        </MDBDropdown>
+
+        <MDBDropdown className="btn-group">
+          {/*<MDBBtn*/}
+          {/*    onClick={() => dispatch(() => {*/}
+          {/*      console.log("text")*/}
+          {/*      return(*/}
+          {/*          <div>*/}
+          {/*            <MDBFile label='Default file input example' id='customFile' />*/}
+          {/*          </div>*/}
+          {/*      )*/}
+          {/*    })}*/}
+          {/*    size={"sm"}*/}
+          {/*    outline*/}
+          {/*    color={"dark"}*/}
+          {/*>*/}
+          {/*  <BiDownload size={"20"} />*/}
+          {/*</MDBBtn>*/}
+          <SelectFileButton></SelectFileButton>
+          <MDBDropdownToggle
+              size={"sm"}
+              outline
+              color={"dark"}
+          ></MDBDropdownToggle>
+          <MDBDropdownMenu>
           </MDBDropdownMenu>
         </MDBDropdown>
       </div>

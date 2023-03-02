@@ -3,10 +3,12 @@ package ru.nsu.backend.person.initial;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.backend.converter.TypesConverter;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPersonService;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -23,20 +25,20 @@ public class PersonController {
 //    @Value("${download.filename}")
 //    private final String downloadFilename;
 
-//    @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
-//    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file, @RequestBody String format) {
-//        try {
-//            if (format.equals("json") && personService.downloadJSONFile(file.getInputStream())) {
-//                return ResponseEntity.ok("Downloaded");
-//            } else if (format.equals("xml") && personService.downloadXMLFile(file.getInputStream())) {
-//                return ResponseEntity.ok("Downloaded");
-//            } else {
-//                return ResponseEntity.badRequest().body("Can not download file");
-//            }
-//        } catch (IOException e) {
-//            return ResponseEntity.badRequest().body("Can not download file");
-//        }
-//    }
+    @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
+    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file, @RequestBody String format) {
+        try {
+            if (format.equals("json") && personService.downloadJSONFile(file.getInputStream())) {
+                return ResponseEntity.ok("Downloaded");
+            } else if (format.equals("xml") && personService.downloadXMLFile(file.getInputStream())) {
+                return ResponseEntity.ok("Downloaded");
+            } else {
+                return ResponseEntity.badRequest().body("Can not download file");
+            }
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body("Can not download file");
+        }
+    }
 
     @GetMapping({"root/downloadFile", "admin/downloadFile"})
     public ResponseEntity<byte[]> downloadFile(@RequestParam String fileType) {
