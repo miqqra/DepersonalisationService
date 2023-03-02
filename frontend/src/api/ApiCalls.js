@@ -69,10 +69,15 @@ export async function updatePeople(credentials) {
 }
 
 export async function downloadSpecificType(filetype) {
-  return fetch(apiAddress + `/root/downloadFile?fileType=${filetype}`, {
-    method: "GET",
-    headers: getAccessTokenHeader(),
-  }).then((r) =>
+  const role = getUserRole();
+  return fetch(
+    apiAddress +
+      `${isDepersonalised()}/${role}/downloadFile?fileType=${filetype}`,
+    {
+      method: "GET",
+      headers: getAccessTokenHeader(),
+    }
+  ).then((r) =>
     r.arrayBuffer().then((data) => ({ status: r.status, data: data }))
   );
 }

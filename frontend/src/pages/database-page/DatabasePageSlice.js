@@ -20,7 +20,6 @@ export const databasePageSlice = createSlice({
           user[action.payload.key] = action.payload.value;
         }
       });
-      console.log(state.users);
     },
     setIsLoadingItems: (state) => {
       state.users = new StateWithLoader([], LoadingState.LOADING);
