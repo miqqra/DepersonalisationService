@@ -1,5 +1,6 @@
 import { getAccessToken, getRefreshToken, getUserRole } from "./Cookie";
 import { apiAddress } from "./BackendSettings";
+import { store } from "../store/Store";
 
 const getAccessTokenHeader = () => {
   const token = getAccessToken();
@@ -14,6 +15,11 @@ const getDefaultHeader = () => {
   return {
     "Content-Type": "application/json",
   };
+};
+
+const isDepersonalised = () => {
+  const isDepersonalised = store.getState().databasePage.isDepersonalised;
+  return isDepersonalised ? "/depersonalised" : "";
 };
 
 export async function login(credentials) {
@@ -40,17 +46,10 @@ export async function updateToken() {
 
 export async function getUsers() {
   const role = getUserRole();
-  if (role === "user") {
-    return fetch(apiAddress + `/depersonalised/${role}/users`, {
-      method: "GET",
-      headers: getAccessTokenHeader(),
-    }).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
-  } else {
-    return fetch(apiAddress + `/${role}/users`, {
-      method: "GET",
-      headers: getAccessTokenHeader(),
-    }).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
-  }
+  return fetch(apiAddress + `/${role}/users`, {
+    method: "GET",
+    headers: getAccessTokenHeader(),
+  }).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
 }
 
 export async function getDepersonalisedUsers() {
@@ -69,20 +68,35 @@ export async function updatePeople(credentials) {
   }).then((r) => ({ status: r.status }));
 }
 
-export async function downloadXLSX() {
-  return fetch(apiAddress + "/root/downloadFile?fileType=xlsx", {
-    method: "GET",
-    headers: getAccessTokenHeader(),
-  }).then((r) =>
+export async function downloadSpecificType(filetype) {
+  const role = getUserRole();
+  return fetch(
+    apiAddress +
+      `${isDepersonalised()}/${role}/downloadFile?fileType=${filetype}`,
+    {
+      method: "GET",
+      headers: getAccessTokenHeader(),
+    }
+  ).then((r) =>
     r.arrayBuffer().then((data) => ({ status: r.status, data: data }))
   );
 }
 
-export async function downloadCSV() {
-  return fetch(apiAddress + "/root/downloadFile?fileType=csv", {
+export async function updateDepersonalised() {
+  const role = getUserRole();
+  return fetch(apiAddress + `/${role}/updated`, {
     method: "GET",
     headers: getAccessTokenHeader(),
-  }).then((r) =>
-      r.arrayBuffer().then((data) => ({ status: r.status, data: data }))
-  );
+  }).then((r) => ({ status: r.status }));
+}
+
+export async function uploadSearchedUsers(param) {
+  const role = getUserRole();
+  return fetch(
+    apiAddress + `${isDepersonalised()}/${role}/find?param=${param}`,
+    {
+      method: "GET",
+      headers: getAccessTokenHeader(),
+    }
+  ).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
 }

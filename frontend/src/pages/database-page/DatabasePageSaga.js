@@ -1,37 +1,43 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { execApiCall } from "../../utils/ApiUtils";
 import {
-  downloadXLSX,
+  downloadSpecificType,
   getDepersonalisedUsers,
   getUsers,
+  updateDepersonalised,
   updatePeople,
-    downloadCSV,
+  uploadSearchedUsers,
 } from "../../api/ApiCalls";
 import { createErrorToast, createSuccessToast } from "../../models/ToastModel";
 import {
   uploadDepersonalisedUsers,
   uploadUsers,
   synchronizeUsers,
-  downloadXlsx,
-    downloadCsv
+  downloadFileType,
+  depersonaliseUsers,
+  searchUsers,
 } from "./DatabasePageActions";
-import { updateItems } from "./DatabasePageSlice";
+import { setIsDepersonalised, updateItems } from "./DatabasePageSlice";
 import { store } from "../../store/Store";
 import { downloadFile } from "../../utils/BrowserUtils";
 
 export function* databasePageSagaWatcher() {
-    yield takeEvery(uploadUsers, sagaGetUsers);
-    yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
-    yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
-    yield takeEvery(downloadXlsx, sagaDownloadXlsx);
-    yield takeEvery(downloadCsv ,sagaDownloadCSV);
+  yield takeEvery(uploadUsers, sagaGetUsers);
+  yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
+  yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
+  yield takeEvery(depersonaliseUsers, sagaDepersonaliseUsers);
+  yield takeEvery(searchUsers, sagaSearchUsers);
+  yield takeEvery(uploadUsers, sagaGetUsers);
+  yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
+  yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
+  yield takeEvery(downloadFileType, sagaDownloadFile);
 }
 
 function* sagaGetUsers() {
   yield call(execApiCall, {
     mainCall: () => getUsers(),
     *onSuccess(response) {
-      createSuccessToast(`Данные получены`);
+      yield put(setIsDepersonalised(false));
       yield put(updateItems(response.data));
     },
     onAnyError() {
@@ -44,7 +50,7 @@ function* sagaGetDepersonalisedUsers() {
   yield call(execApiCall, {
     mainCall: () => getDepersonalisedUsers(),
     *onSuccess(response) {
-      createSuccessToast(`Данные получены`);
+      yield put(setIsDepersonalised(true));
       yield put(updateItems(response.data));
     },
     onAnyError() {
@@ -66,11 +72,11 @@ function* sagaSynchronizeUsers() {
   });
 }
 
-function* sagaDownloadXlsx() {
+function* sagaDownloadFile(action) {
   yield call(execApiCall, {
-    mainCall: () => downloadXLSX(),
+    mainCall: () => downloadSpecificType(action.payload),
     onSuccess(response) {
-      downloadFile(response.data, "data.xlsx");
+      downloadFile(response.data, `data.${action.payload}`);
     },
     onAnyError() {
       createErrorToast(`Не удалось скачать данные`);
@@ -78,14 +84,26 @@ function* sagaDownloadXlsx() {
   });
 }
 
-function* sagaDownloadCSV() {
-    yield call(execApiCall, {
-        mainCall: () => downloadCSV(),
-        onSuccess(response) {
-            downloadFile(response.data, "data.csv");
-        },
-        onAnyError() {
-            createErrorToast(`Не удалось скачать данные csv`);
-        },
-    });
+function* sagaDepersonaliseUsers() {
+  yield call(execApiCall, {
+    mainCall: () => updateDepersonalised(),
+    onSuccess() {
+      createSuccessToast(`Данные деперсонализованы`);
+    },
+    onAnyError() {
+      createErrorToast(`Что-то пошло не так`);
+    },
+  });
+}
+
+function* sagaSearchUsers(action) {
+  yield call(execApiCall, {
+    mainCall: () => uploadSearchedUsers(action.payload),
+    *onSuccess(response) {
+      yield put(updateItems(response.data));
+    },
+    onAnyError() {
+      createErrorToast(`Ошибка сервера`);
+    },
+  });
 }

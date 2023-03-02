@@ -5,5 +5,6 @@ export const uploadDepersonalisedUsers = createAction(
   "database/uploadDepersonalisedUsers"
 );
 export const synchronizeUsers = createAction("database/synchronizeUsers");
-export const downloadXlsx = createAction("database/downloadXlsx");
-export const downloadCsv = createAction("database/downloadCsv");
+export const depersonaliseUsers = createAction("database/depersonaliseUsers");
+export const searchUsers = createAction("database/searchUsers");
+export const downloadFileType = createAction("database/downloadFileType");

@@ -1,24 +1,12 @@
 package ru.nsu.backend.person.depersonalised;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.nsu.backend.converter.TypesConverter;
 import ru.nsu.backend.person.initial.SortingType;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -67,6 +55,23 @@ public class DepersonalisedPersonController {
 //        return ResponseEntity.internalServerError().body(null);
 //    }
 
+
+    @GetMapping({"root/downloadFile", "admin/downloadFile", "user/downloadFile"})
+    public ResponseEntity<byte[]> downloadFile(@RequestParam String fileType) {
+        switch (fileType) {
+            case "json" -> {
+                return ResponseEntity.ok(TypesConverter.toJson(depersonalisedPersonService.getPeople()));
+            }
+            case "csv" -> {
+                return ResponseEntity.ok(TypesConverter.toCsv(depersonalisedPersonService.getPeople()));
+            }
+            case "xlsx" -> {
+                return ResponseEntity.ok(TypesConverter.toXLSX(depersonalisedPersonService.getPeople()));
+            }
+        }
+        return ResponseEntity.badRequest().body("Can't download file".getBytes());
+    }
+
     /**
      * Get all rows of the depersonalised table.
      *
@@ -80,13 +85,13 @@ public class DepersonalisedPersonController {
     /**
      * Sort table by parameter - one of columns name.
      *
-     * @param param column name.
+     * @param param       column name.
      * @param sortingType ascending or descending.
      * @return response entity with sorted list of depersonalised people.
      */
     @GetMapping({"/user/sort", "/admin/sort", "root/sort"})
     public ResponseEntity<List<DepersonalisedPerson>> sortTable(@RequestParam String param,
-                                                  @RequestParam SortingType sortingType) {
+                                                                @RequestParam SortingType sortingType) {
         return ResponseEntity.ok(depersonalisedPersonService.sortTable(param, sortingType));
     }
 
@@ -160,21 +165,21 @@ public class DepersonalisedPersonController {
     /**
      * Change persons info to param.
      *
-     * @param personId personId
-     * @param name name.
-     * @param surname surname.
-     * @param fatherName fatherName.
-     * @param age age.
-     * @param sex sex.
-     * @param dateOfBirth dateOfBirth.
-     * @param passportSeries passportSeries.
-     * @param passportNumber passportNumber.
-     * @param wherePassportWasIssued wherePassportWasIssued.
-     * @param whenPassportWasIssued whenPassportWasIssued.
-     * @param registration registration.
-     * @param work work.
+     * @param personId                     personId
+     * @param name                         name.
+     * @param surname                      surname.
+     * @param fatherName                   fatherName.
+     * @param age                          age.
+     * @param sex                          sex.
+     * @param dateOfBirth                  dateOfBirth.
+     * @param passportSeries               passportSeries.
+     * @param passportNumber               passportNumber.
+     * @param wherePassportWasIssued       wherePassportWasIssued.
+     * @param whenPassportWasIssued        whenPassportWasIssued.
+     * @param registration                 registration.
+     * @param work                         work.
      * @param taxpayerIdentificationNumber taxpayerIdentificationNumber.
-     * @param snils snils.
+     * @param snils                        snils.
      * @return response entity with result - updated or not.
      */
     @PutMapping({"/user/update/{personId}", "/root/update/{personId}", "/admin/update/{personId}"})
@@ -217,7 +222,7 @@ public class DepersonalisedPersonController {
     /**
      * Change persons info to param.
      *
-     * @param personId personId.
+     * @param personId             personId.
      * @param depersonalisedPerson new info about person with personId.
      * @return response entity with result - updated or not.
      */

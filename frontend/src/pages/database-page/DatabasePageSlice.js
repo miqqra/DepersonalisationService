@@ -4,6 +4,7 @@ import LoadingState from "../../enums/LoadingState";
 
 const initialState = {
   users: new StateWithLoader([], LoadingState.LOADING),
+  isDepersonalised: false,
 };
 
 export const databasePageSlice = createSlice({
@@ -19,13 +20,15 @@ export const databasePageSlice = createSlice({
           user[action.payload.key] = action.payload.value;
         }
       });
-      console.log(state.users);
     },
     setIsLoadingItems: (state) => {
       state.users = new StateWithLoader([], LoadingState.LOADING);
     },
     setErrorLoadingItems: (state) => {
       state.users = new StateWithLoader([], LoadingState.ERROR);
+    },
+    setIsDepersonalised: (state, action) => {
+      state.isDepersonalised = action.payload;
     },
   },
 });
@@ -35,6 +38,7 @@ export const {
   updateUser,
   setIsLoadingItems,
   setErrorLoadingItems,
+  setIsDepersonalised,
 } = databasePageSlice.actions;
 
 export default databasePageSlice.reducer;
