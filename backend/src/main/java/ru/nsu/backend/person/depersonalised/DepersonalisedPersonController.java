@@ -116,7 +116,8 @@ public class DepersonalisedPersonController {
                     return ResponseEntity.badRequest().body("Cannot find anything for that request");
                 }
             } catch (NumberFormatException e2) {
-                List<DepersonalisedPerson> depersonalisedPerson = depersonalisedPersonService.findPerson(param);
+                List<DepersonalisedPerson> depersonalisedPerson = depersonalisedPersonService
+                        .findPerson(param.toLowerCase());
                 if (depersonalisedPerson != null) {
                     return ResponseEntity.ok(depersonalisedPerson);
                 } else {

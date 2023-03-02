@@ -139,7 +139,7 @@ public class PersonController {
                     return ResponseEntity.badRequest().body("Cannot find anything for that request");
                 }
             } catch (NumberFormatException e2) {
-                List<InitialPerson> person = personService.findPerson(param);
+                List<InitialPerson> person = personService.findPerson(param.toLowerCase());
                 if (person != null) {
                     return ResponseEntity.ok(person);
                 } else {
