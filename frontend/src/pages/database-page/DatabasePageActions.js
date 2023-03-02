@@ -6,3 +6,4 @@ export const uploadDepersonalisedUsers = createAction(
 );
 export const synchronizeUsers = createAction("database/synchronizeUsers");
 export const downloadXlsx = createAction("database/downloadXlsx");
+export const downloadCsv = createAction("database/downloadCsv");

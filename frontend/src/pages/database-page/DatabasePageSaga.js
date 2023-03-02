@@ -74,3 +74,15 @@ function* sagaDownloadXlsx() {
     },
   });
 }
+
+function* sagaDownloadCSV() {
+    yield call(execApiCall, {
+        mainCall: () => downloadCSV(),
+        onSuccess(response) {
+            downloadFile(response.data, "data.csv");
+        },
+        onAnyError() {
+            createErrorToast(`Не удалось скачать данные csv`);
+        },
+    });
+}
