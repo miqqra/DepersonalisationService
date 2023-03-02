@@ -1,0 +1,29 @@
+version: '3'
+services:
+  playground-web-db:
+    image: 'postgres:14'
+    container_name: 'java-postgres'
+    ports:
+      - 5432:5432
+    environment:
+        - 'POSTGRES_USER=postgres'
+        - 'POSTGRES_HOST_AUTH_METHOD=trust'
+        - 'POSTGRES_DB=person'
+  playground-web-frontend:
+    image: playground-web-frontend:latest
+    environment:
+      PORT: 3000
+      PROXY_API: http://playground-web-backend:8080/
+    ports:
+      - 3000:3000
+  playground-web-backend:
+    image: playground-web-backend:latest
+    depends_on:
+      - playground-web-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/person
+        - SPRING_DATASOURCE_USERNAME=postgres
+        - SPRING_DATASOURCE_PASSWORD=postgres
+        - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+    ports:
+      - 8080:8080
