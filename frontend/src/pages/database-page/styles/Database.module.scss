@@ -11,10 +11,20 @@
   max-width: fit-content;
 }
 
+.navbar {
+  display: flex;
+  flex-direction: row;
+}
+
 .fetch_buttons {
   @include row-leftmost;
   padding: 10px;
   grid-gap: 10px;
+  flex-grow: 2;
+}
+
+.user_menu {
+  padding: 10px;
 }
 
 .outlet {

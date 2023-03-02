@@ -1,0 +1,31 @@
+@import 'src/styles/_mixins';
+
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: lightgray;
+}
+
+.header_content {
+  @include column-center;
+}
+
+.outlet {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.form {
+  @include column-center;
+  grid-gap: 13px;
+}

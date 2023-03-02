@@ -63,6 +63,9 @@ public class AccountResource {
         AppUser newAccount;
         try {
             newAccount = accountService.createAppUser(account);
+            for (Role role : account.getRoles()) {
+                accountService.addRoleToUser(newAccount.getUsername(), role.getName());
+            }
         } catch (ResponseException e) {
             return e.response();
         }

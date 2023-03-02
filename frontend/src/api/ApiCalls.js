@@ -33,6 +33,14 @@ export async function login(credentials) {
   }).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
 }
 
+export async function logout() {
+  const header = getAccessTokenHeader();
+  return fetch(apiAddress + "/accounts/token/logout", {
+    method: "GET",
+    headers: header,
+  }).then((r) => ({ status: r.status }));
+}
+
 export async function updateToken() {
   const header = {
     ...getDefaultHeader(),
@@ -99,4 +107,13 @@ export async function uploadSearchedUsers(param) {
       headers: getAccessTokenHeader(),
     }
   ).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
+}
+
+export async function addUser(credentials) {
+  const role = getUserRole();
+  return fetch(apiAddress + `/accounts/${role}/users/create`, {
+    method: "POST",
+    headers: getAccessTokenHeader(),
+    body: JSON.stringify(credentials),
+  });
 }

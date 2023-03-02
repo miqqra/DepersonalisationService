@@ -26,7 +26,10 @@ import styles from "./styles/Database.module.scss";
 import LoadingStateBlock from "../../components/loading-state-block/LoadingStateBlock";
 import { getUserRole } from "../../api/Cookie";
 import { useState } from "react";
-import { BiDownload, BiSearch } from "react-icons/bi";
+import { BiDownload, BiSearch, BiUser } from "react-icons/bi";
+import { logoutUser } from "../login-page/LoginPageActions";
+import { redirect } from "../../utils/BrowserUtils";
+import { paths } from "../../routePaths";
 
 function DatabasePageContent() {
   const dispatch = useDispatch();
@@ -105,60 +108,82 @@ function DatabasePageContent() {
 
   return (
     <div className={styles.root}>
-      <div className={styles.fetch_buttons}>
-        <MDBBtn
-          onClick={() =>
-            userRole === "user"
-              ? dispatch(uploadDepersonalisedUsers)
-              : dispatch(uploadUsers)
-          }
-          color={"dark"}
-          size={"sm"}
-        >
-          Импорт
-        </MDBBtn>
-        <MDBBtn
-          onClick={() => dispatch(synchronizeUsers)}
-          color={"dark"}
-          size={"sm"}
-        >
-          Экспорт
-        </MDBBtn>
-        <MDBDropdown className="btn-group">
+      <div className={styles.navbar}>
+        <div className={styles.fetch_buttons}>
           <MDBBtn
-            onClick={() => dispatch(downloadFileType("xlsx"))}
-            size={"sm"}
-            outline
+            onClick={() =>
+              userRole === "user"
+                ? dispatch(uploadDepersonalisedUsers)
+                : dispatch(uploadUsers)
+            }
             color={"dark"}
+            size={"sm"}
           >
-            <BiDownload size={"20"} />
+            Импорт
           </MDBBtn>
-          <MDBDropdownToggle
-            size={"sm"}
-            outline
+          <MDBBtn
+            onClick={() => dispatch(synchronizeUsers)}
             color={"dark"}
-          ></MDBDropdownToggle>
-          <MDBDropdownMenu>
-            <MDBDropdownItem
+            size={"sm"}
+          >
+            Экспорт
+          </MDBBtn>
+          <MDBDropdown className="btn-group">
+            <MDBBtn
               onClick={() => dispatch(downloadFileType("xlsx"))}
-              link
+              size={"sm"}
+              outline
+              color={"dark"}
             >
-              XLSX
-            </MDBDropdownItem>
-            <MDBDropdownItem
-              onClick={() => dispatch(downloadFileType("csv"))}
-              link
-            >
-              CSV
-            </MDBDropdownItem>
-            <MDBDropdownItem
-              onClick={() => dispatch(downloadFileType("json"))}
-              link
-            >
-              JSON
-            </MDBDropdownItem>
-          </MDBDropdownMenu>
-        </MDBDropdown>
+              <BiDownload size={"20"} />
+            </MDBBtn>
+            <MDBDropdownToggle
+              size={"sm"}
+              outline
+              color={"dark"}
+            ></MDBDropdownToggle>
+            <MDBDropdownMenu>
+              <MDBDropdownItem
+                onClick={() => dispatch(downloadFileType("xlsx"))}
+                link
+              >
+                XLSX
+              </MDBDropdownItem>
+              <MDBDropdownItem
+                onClick={() => dispatch(downloadFileType("csv"))}
+                link
+              >
+                CSV
+              </MDBDropdownItem>
+              <MDBDropdownItem
+                onClick={() => dispatch(downloadFileType("json"))}
+                link
+              >
+                JSON
+              </MDBDropdownItem>
+            </MDBDropdownMenu>
+          </MDBDropdown>
+        </div>
+        <div className={styles.user_menu}>
+          <MDBDropdown>
+            <MDBDropdownToggle color={"dark"} outline>
+              <BiUser size={"20"} />
+            </MDBDropdownToggle>
+            <MDBDropdownMenu appendToBody>
+              <MDBDropdownItem onClick={() => redirect(paths.PROFILE)} link>
+                Настройки
+              </MDBDropdownItem>
+              <MDBDropdownItem
+                onClick={() => {
+                  dispatch(logoutUser);
+                }}
+                link
+              >
+                Выйти
+              </MDBDropdownItem>
+            </MDBDropdownMenu>
+          </MDBDropdown>
+        </div>
       </div>
       <div className={styles.outlet}>
         <div className={styles.database}>

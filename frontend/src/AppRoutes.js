@@ -3,6 +3,7 @@ import { paths } from "./routePaths";
 import LoginPage from "./pages/login-page/LoginPage";
 import Page from "./components/page/Page";
 import DatabasePage from "./pages/database-page/DatabasePage";
+import ProfilePage from "./pages/profile-page/ProfilePage";
 
 function AppRoutes() {
   return (
@@ -12,6 +13,7 @@ function AppRoutes() {
           <Route index element={<LoginPage />} />
           <Route path={paths.LOGIN} element={<LoginPage />} />
           <Route path={paths.DATABASE} element={<DatabasePage />} />
+          <Route path={paths.PROFILE} element={<ProfilePage />} />
           <Route path={paths.NOTFOUND} element={undefined} />
           <Route index element={undefined} />
         </Route>
