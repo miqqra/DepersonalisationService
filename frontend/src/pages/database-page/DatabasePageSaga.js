@@ -4,7 +4,9 @@ import {
   downloadXLSX,
   getDepersonalisedUsers,
   getUsers,
+  updateDepersonalised,
   updatePeople,
+  uploadSearchedUsers,
 } from "../../api/ApiCalls";
 import { createErrorToast, createSuccessToast } from "../../models/ToastModel";
 import {
@@ -12,8 +14,10 @@ import {
   uploadUsers,
   synchronizeUsers,
   downloadXlsx,
+  depersonaliseUsers,
+  searchUsers,
 } from "./DatabasePageActions";
-import { updateItems } from "./DatabasePageSlice";
+import { setIsDepersonalised, updateItems } from "./DatabasePageSlice";
 import { store } from "../../store/Store";
 import { downloadFile } from "../../utils/BrowserUtils";
 
@@ -22,13 +26,15 @@ export function* databasePageSagaWatcher() {
   yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
   yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
   yield takeEvery(downloadXlsx, sagaDownloadXlsx);
+  yield takeEvery(depersonaliseUsers, sagaDepersonaliseUsers);
+  yield takeEvery(searchUsers, sagaSearchUsers);
 }
 
 function* sagaGetUsers() {
   yield call(execApiCall, {
     mainCall: () => getUsers(),
     *onSuccess(response) {
-      createSuccessToast(`Данные получены`);
+      yield put(setIsDepersonalised(false));
       yield put(updateItems(response.data));
     },
     onAnyError() {
@@ -41,7 +47,7 @@ function* sagaGetDepersonalisedUsers() {
   yield call(execApiCall, {
     mainCall: () => getDepersonalisedUsers(),
     *onSuccess(response) {
-      createSuccessToast(`Данные получены`);
+      yield put(setIsDepersonalised(true));
       yield put(updateItems(response.data));
     },
     onAnyError() {
@@ -71,6 +77,30 @@ function* sagaDownloadXlsx() {
     },
     onAnyError() {
       createErrorToast(`Не удалось скачать данные`);
+    },
+  });
+}
+
+function* sagaDepersonaliseUsers() {
+  yield call(execApiCall, {
+    mainCall: () => updateDepersonalised(),
+    onSuccess() {
+      createSuccessToast(`Данные деперсонализованы`);
+    },
+    onAnyError() {
+      createErrorToast(`Что-то пошло не так`);
+    },
+  });
+}
+
+function* sagaSearchUsers(action) {
+  yield call(execApiCall, {
+    mainCall: () => uploadSearchedUsers(action.payload),
+    *onSuccess(response) {
+      yield put(updateItems(response.data));
+    },
+    onAnyError() {
+      createErrorToast(`Ошибка сервера`);
     },
   });
 }

@@ -4,6 +4,8 @@ import {
   MDBDropdownItem,
   MDBDropdownMenu,
   MDBDropdownToggle,
+  MDBInput,
+  MDBInputGroup,
   MDBSwitch,
   MDBTable,
   MDBTableBody,
@@ -17,19 +19,23 @@ import {
   uploadUsers,
   synchronizeUsers,
   downloadXlsx,
+  depersonaliseUsers,
+  searchUsers,
 } from "./DatabasePageActions";
 import styles from "./styles/Database.module.scss";
 import LoadingStateBlock from "../../components/loading-state-block/LoadingStateBlock";
 import { getUserRole } from "../../api/Cookie";
 import { useState } from "react";
-import { BiDownload } from "react-icons/bi";
+import { BiDownload, BiSearch } from "react-icons/bi";
 
 function DatabasePageContent() {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.databasePage.users);
-  const [isDepersonalised, setIsDepersonalised] = useState(
-    getUserRole() === "user"
+  const isDepersonalised = useSelector(
+    (state) => state.databasePage.isDepersonalised
   );
+  const [searchQuery, setSearchQuery] = useState("");
+  const userRole = getUserRole();
 
   const columns = [
     UserData.NAME,
@@ -102,7 +108,11 @@ function DatabasePageContent() {
     <div className={styles.root}>
       <div className={styles.fetch_buttons}>
         <MDBBtn
-          onClick={() => dispatch(uploadUsers)}
+          onClick={() =>
+            userRole === "user"
+              ? dispatch(uploadDepersonalisedUsers)
+              : dispatch(uploadUsers)
+          }
           color={"dark"}
           size={"sm"}
         >
@@ -141,6 +151,21 @@ function DatabasePageContent() {
         <div className={styles.database}>
           <LoadingStateBlock loadingState={users}>
             <div className={styles.table}>
+              <MDBInputGroup>
+                <MDBInput
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  wrapperStyle={{ flexGrow: "2" }}
+                  label={"Поиск"}
+                ></MDBInput>
+                <MDBBtn
+                  onClick={() => dispatch(searchUsers(searchQuery))}
+                  color={"dark"}
+                  outline
+                >
+                  <BiSearch size={"17"}></BiSearch>
+                </MDBBtn>
+              </MDBInputGroup>
               <MDBTable responsive align={"middle"} small hover>
                 <MDBTableHead dark>{columnsList}</MDBTableHead>
                 <MDBTableBody>{usersList}</MDBTableBody>
@@ -150,17 +175,20 @@ function DatabasePageContent() {
               <MDBSwitch
                 label={isDepersonalised ? "Деперсонализованная" : "Исходная"}
                 onClick={() => {
-                  if (isDepersonalised) {
-                    dispatch(uploadUsers);
-                  } else {
-                    dispatch(uploadDepersonalisedUsers);
-                  }
-                  setIsDepersonalised(!isDepersonalised);
+                  isDepersonalised
+                    ? dispatch(uploadUsers)
+                    : dispatch(uploadDepersonalisedUsers);
                 }}
-                defaultChecked={getUserRole() === "user"}
-                disabled={getUserRole() === "user"}
+                defaultChecked={userRole === "user"}
+                disabled={userRole === "user"}
               />
-              <MDBBtn>Деперсонализовать</MDBBtn>
+              <MDBBtn
+                onClick={() => dispatch(depersonaliseUsers)}
+                disabled={userRole === "user"}
+                color={"dark"}
+              >
+                Деперсонализовать
+              </MDBBtn>
             </div>
           </LoadingStateBlock>
         </div>
