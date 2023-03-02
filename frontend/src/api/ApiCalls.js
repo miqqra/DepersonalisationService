@@ -103,7 +103,7 @@ export async function uploadSearchedUsers(param) {
 
 export async function uploadFile(file){
   let data = new FormData()
-  data.append('file', file.body)
+  data.append('file', file)
   // data.append('format', 'json')
   // console.log(file.body.type);
   return fetch(

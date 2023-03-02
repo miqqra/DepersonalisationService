@@ -26,7 +26,9 @@ public class PersonController {
 //    private final String downloadFilename;
 
     @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
-    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file, @RequestBody String format) {
+    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file) {
+        String format = "json";
+        System.out.println(file);
         try {
             if (format.equals("json") && personService.downloadJSONFile(file.getInputStream())) {
                 return ResponseEntity.ok("Downloaded");
