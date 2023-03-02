@@ -18,10 +18,11 @@ import { store } from "../../store/Store";
 import { downloadFile } from "../../utils/BrowserUtils";
 
 export function* databasePageSagaWatcher() {
-  yield takeEvery(uploadUsers, sagaGetUsers);
-  yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
-  yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
-  yield takeEvery(downloadXlsx, sagaDownloadXlsx);
+    yield takeEvery(uploadUsers, sagaGetUsers);
+    yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
+    yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
+    yield takeEvery(downloadXlsx, sagaDownloadXlsx);
+    yield takeEvery(downloadCsv ,sagaDownloadCSV);
 }
 
 function* sagaGetUsers() {
