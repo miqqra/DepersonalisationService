@@ -27,10 +27,10 @@ export function* databasePageSagaWatcher() {
   yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
   yield takeEvery(depersonaliseUsers, sagaDepersonaliseUsers);
   yield takeEvery(searchUsers, sagaSearchUsers);
-    yield takeEvery(uploadUsers, sagaGetUsers);
-    yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
-    yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
-    yield takeEvery(downloadFileType, sagaDownloadFile);
+  yield takeEvery(uploadUsers, sagaGetUsers);
+  yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
+  yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
+  yield takeEvery(downloadFileType, sagaDownloadFile);
 }
 
 function* sagaGetUsers() {
@@ -72,12 +72,11 @@ function* sagaSynchronizeUsers() {
   });
 }
 
-function* sagaDownloadFile(filetype) {
-  console.log(filetype)
+function* sagaDownloadFile(action) {
   yield call(execApiCall, {
-    mainCall: () => downloadSpecificType(filetype.payload),
+    mainCall: () => downloadSpecificType(action.payload),
     onSuccess(response) {
-      downloadFile(response.data, "data." + filetype.payload);
+      downloadFile(response.data, `data.${action.payload}`);
     },
     onAnyError() {
       createErrorToast(`Не удалось скачать данные`);

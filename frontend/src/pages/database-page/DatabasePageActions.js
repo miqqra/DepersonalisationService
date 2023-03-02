@@ -7,10 +7,4 @@ export const uploadDepersonalisedUsers = createAction(
 export const synchronizeUsers = createAction("database/synchronizeUsers");
 export const depersonaliseUsers = createAction("database/depersonaliseUsers");
 export const searchUsers = createAction("database/searchUsers");
-export const downloadFileType = createAction(
-    "database/downloadXlsx",
-    function downloadFile(filetype) {
-        return {
-            payload: filetype
-        }
-    });
+export const downloadFileType = createAction("database/downloadFileType");

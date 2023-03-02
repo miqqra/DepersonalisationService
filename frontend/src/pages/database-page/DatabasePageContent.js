@@ -27,7 +27,6 @@ import LoadingStateBlock from "../../components/loading-state-block/LoadingState
 import { getUserRole } from "../../api/Cookie";
 import { useState } from "react";
 import { BiDownload, BiSearch } from "react-icons/bi";
-import {downloadSpecificType} from "../../api/ApiCalls";
 
 function DatabasePageContent() {
   const dispatch = useDispatch();
@@ -55,55 +54,54 @@ function DatabasePageContent() {
     UserData.INIPA,
   ];
 
-    const columnsList = (
-        <tr className={styles.table_row}>
-            <th scope="col">ID</th>
-            <th scope="col">Имя</th>
-            <th scope="col">Фамилия</th>
-            <th scope="col">Отчество</th>
-            <th scope="col">Возраст</th>
-            <th scope="col">Пол</th>
-            <th scope="col">Дата рождения</th>
-            <th scope="col">Серия паспорта</th>
-            <th scope="col">Номер паспорта</th>
-            <th scope="col">Кем выдан</th>
-            <th scope="col">Когда выдан</th>
-            <th scope="col">Регистрация</th>
-            <th scope="col">Работа</th>
-            <th scope="col">ИНН</th>
-            <th scope="col">СНИЛС</th>
-        </tr>
+  const columnsList = (
+    <tr className={styles.table_row}>
+      <th scope="col">ID</th>
+      <th scope="col">Имя</th>
+      <th scope="col">Фамилия</th>
+      <th scope="col">Отчество</th>
+      <th scope="col">Возраст</th>
+      <th scope="col">Пол</th>
+      <th scope="col">Дата рождения</th>
+      <th scope="col">Серия паспорта</th>
+      <th scope="col">Номер паспорта</th>
+      <th scope="col">Кем выдан</th>
+      <th scope="col">Когда выдан</th>
+      <th scope="col">Регистрация</th>
+      <th scope="col">Работа</th>
+      <th scope="col">ИНН</th>
+      <th scope="col">СНИЛС</th>
+    </tr>
+  );
+  const usersList = users.value.map((user) => {
+    return (
+      <tr key={user.id}>
+        <th scope="row">{user.id}</th>
+        {columns.map((column, index) => {
+          // noinspection JSUnresolvedVariable
+          return (
+            <td
+              className={styles.table_row}
+              onInput={(event) =>
+                dispatch(
+                  updateUser({
+                    id: user.id,
+                    key: column,
+                    value: event.target.innerText,
+                  })
+                )
+              }
+              contentEditable={true}
+              suppressContentEditableWarning={true}
+              key={index}
+            >
+              {user[column]}
+            </td>
+          );
+        })}
+      </tr>
     );
-    let type = "csv";
-    const usersList = users.value.map((user) => {
-        return (
-            <tr key={user.id}>
-                <th scope="row">{user.id}</th>
-                {columns.map((column, index) => {
-                    // noinspection JSUnresolvedVariable
-                    return (
-                        <td
-                            className={styles.table_row}
-                            onInput={(event) =>
-                                dispatch(
-                                    updateUser({
-                                        id: user.id,
-                                        key: column,
-                                        value: event.target.innerText,
-                                    })
-                                )
-                            }
-                            contentEditable={true}
-                            suppressContentEditableWarning={true}
-                            key={index}
-                        >
-                            {user[column]}
-                        </td>
-                    );
-                })}
-            </tr>
-        );
-    });
+  });
 
   return (
     <div className={styles.root}>
@@ -128,7 +126,7 @@ function DatabasePageContent() {
         </MDBBtn>
         <MDBDropdown className="btn-group">
           <MDBBtn
-            onClick={() => dispatch(downloadSpecificType(type))}
+            onClick={() => dispatch(downloadFileType("xlsx"))}
             size={"sm"}
             outline
             color={"dark"}
@@ -141,13 +139,22 @@ function DatabasePageContent() {
             color={"dark"}
           ></MDBDropdownToggle>
           <MDBDropdownMenu>
-            <MDBDropdownItem onClick={() => dispatch(downloadFileType(type = "xlsx"))} link>
+            <MDBDropdownItem
+              onClick={() => dispatch(downloadFileType("xlsx"))}
+              link
+            >
               XLSX
             </MDBDropdownItem>
-            <MDBDropdownItem onClick={() => dispatch(downloadFileType(type = "csv"))} link>
+            <MDBDropdownItem
+              onClick={() => dispatch(downloadFileType("csv"))}
+              link
+            >
               CSV
             </MDBDropdownItem>
-            <MDBDropdownItem onClick={() => dispatch(downloadFileType(type = "json"))} link>
+            <MDBDropdownItem
+              onClick={() => dispatch(downloadFileType("json"))}
+              link
+            >
               JSON
             </MDBDropdownItem>
           </MDBDropdownMenu>

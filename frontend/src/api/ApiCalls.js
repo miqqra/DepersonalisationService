@@ -69,7 +69,7 @@ export async function updatePeople(credentials) {
 }
 
 export async function downloadSpecificType(filetype) {
-  return fetch(apiAddress + "/root/downloadFile?fileType=" + filetype, {
+  return fetch(apiAddress + `/root/downloadFile?fileType=${filetype}`, {
     method: "GET",
     headers: getAccessTokenHeader(),
   }).then((r) =>
