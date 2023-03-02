@@ -41,16 +41,21 @@ public class Depersonalisation {
 
         int passportNum = 0;
         int passportSeries = 0;
+        long snils = 0;
+        long tin = 0;
 
         Random random = new Random();
 
         for (var person : personListDepersonalised) {
+            // dates
             person.setDob(
                 person.getDob().plusDays(random.nextInt(-dateRange, dateRange + 1))
             );
             person.setWhenIssued(
                 person.getWhenIssued().plusDays(random.nextInt(-dateRange, dateRange + 1))
             );
+
+            // passport
             if (passportNum == 1000000) {
                 passportNum = 0;
             }
@@ -63,6 +68,22 @@ public class Depersonalisation {
 
             person.setNumber(numberFormatted);
             person.setSeries(seriesFormatted);
+
+            // snils
+            if (snils == 100000000000L) {
+                snils = 0;
+            }
+
+            String snilsFormatted = String.format("%011d", snils++);
+            person.setSnils(snilsFormatted);
+
+            // tin (ИНН)
+            if (tin == 1000000000000L) {
+                tin = 0;
+            }
+
+            String tinFormatted = String.format("%012d", tin++);
+            person.setTin(tinFormatted);
         }
         return personListDepersonalised;
     }
@@ -316,29 +337,4 @@ public class Depersonalisation {
 
         return result;
     }
-
-    /*
-    public static void main(String[] args) {
-
-        // permute
-        List<InitialPerson> people = new ArrayList<>();
-        people.add(new InitialPerson(0, "sur0", "first0", "pat0", 0, '0', LocalDate.now(), "ser0", "num0", "where0", LocalDate.now(), "reg0", "work0", "tin0", "snils0"));
-        people.add(new InitialPerson(1, "sur1", "first1", "pat1", 1, '1', LocalDate.now(), "ser1", "num1", "where1", LocalDate.now(), "reg1", "work1", "tin1", "snils1"));
-        people.add(new InitialPerson(2, "sur2", "first2", "pat2", 2, '2', LocalDate.now(), "ser2", "num2", "where2", LocalDate.now(), "reg2", "work2", "tin2", "snils2"));
-        people.add(new InitialPerson(3, "sur3", "first3", "pat3", 3, '3', LocalDate.now(), "ser3", "num3", "where3", LocalDate.now(), "reg3", "work3", "tin3", "snils3"));
-        people.add(new InitialPerson(4, "sur4", "first4", "pat4", 4, '4', LocalDate.now(), "ser4", "num4", "where4", LocalDate.now(), "reg4", "work4", "tin4", "snils4"));
-        people.add(new InitialPerson(5, "sur5", "first5", "pat5", 5, '5', LocalDate.now(), "ser5", "num5", "where5", LocalDate.now(), "reg5", "work5", "tin5", "snils5"));
-        people.add(new InitialPerson(6, "sur6", "first6", "pat6", 6, '6', LocalDate.now(), "ser6", "num6", "where6", LocalDate.now(), "reg6", "work6", "tin6", "snils6"));
-        people.add(new InitialPerson(7, "sur7", "first7", "pat7", 7, '7', LocalDate.now(), "ser7", "num7", "where7", LocalDate.now(), "reg7", "work7", "tin7", "snils7"));
-
-        for (var i : people) {
-            System.out.println(i);
-        }
-        System.out.println("---------------------------------------");
-        for (var i : new Depersonalisation(people).depersonaliseWithRandom(9)) {
-            System.out.println(i);
-        }
-    }
-
-     */
 }
