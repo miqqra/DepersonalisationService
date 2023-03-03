@@ -15,25 +15,22 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "./DatabasePageSlice";
 import UserData from "../../enums/UserData";
 import {
-    depersonaliseUsers,
-    downloadFileType,
-    searchUsers,
-    synchronizeUsers,
-    uploadDepersonalisedUsers,
-    uploadFileType,
-    uploadUsers,
+  depersonaliseUsers,
+  downloadFileType,
+  searchUsers,
+  synchronizeUsers,
+  uploadDepersonalisedUsers,
+  uploadFileType,
+  uploadUsers,
 } from "./DatabasePageActions";
 import styles from "./styles/Database.module.scss";
 import LoadingStateBlock from "../../components/loading-state-block/LoadingStateBlock";
 import { getUserRole } from "../../api/Cookie";
-import { useState } from "react";
-import { BiDownload, BiSearch, BiUser } from "react-icons/bi";
+import { BiCloudUpload, BiDownload, BiSearch, BiUser } from "react-icons/bi";
 import { logoutUser } from "../login-page/LoginPageActions";
 import { redirect } from "../../utils/BrowserUtils";
 import { paths } from "../../routePaths";
-import {getUserRole} from "../../api/Cookie";
-import {useRef, useState} from "react";
-import {BiCloudUpload, BiDownload, BiSearch} from "react-icons/bi";
+import { useRef, useState } from "react";
 
 function DatabasePageContent() {
   const dispatch = useDispatch();
@@ -111,31 +108,26 @@ function DatabasePageContent() {
   });
 
   function SelectFileButton() {
-
     const fileInput = useRef();
     const selectFile = () => {
       fileInput.current.click();
-    }
+    };
 
     return (
-        <div>
-          <input
-              type="file"
-              style={{"display": "none"}}
-              ref={fileInput}
-              onChange={(e) => dispatch(uploadFileType(e.target.files[0]))}
-          />
-          <MDBBtn
-              onClick={selectFile}
-              size={"sm"}
-              outline
-              color={"dark"}
-          >
-            <BiCloudUpload size={"20"}/>
-          </MDBBtn>
-        </div>
-    )
+      <div>
+        <input
+          type="file"
+          style={{ display: "none" }}
+          ref={fileInput}
+          onChange={(e) => dispatch(uploadFileType(e.target.files[0]))}
+        />
+        <MDBBtn onClick={selectFile} size={"sm"} outline color={"dark"}>
+          <BiCloudUpload size={"20"} />
+        </MDBBtn>
+      </div>
+    );
   }
+
   return (
     <div className={styles.root}>
       <div className={styles.navbar}>
@@ -158,6 +150,7 @@ function DatabasePageContent() {
           >
             Экспорт
           </MDBBtn>
+          <SelectFileButton></SelectFileButton>
           <MDBDropdown className="btn-group">
             <MDBBtn
               onClick={() => dispatch(downloadFileType("xlsx"))}
@@ -196,7 +189,7 @@ function DatabasePageContent() {
         </div>
         <div className={styles.user_menu}>
           <MDBDropdown>
-            <MDBDropdownToggle color={"dark"} outline>
+            <MDBDropdownToggle size={"sm"} color={"dark"} outline>
               <BiUser size={"20"} />
             </MDBDropdownToggle>
             <MDBDropdownMenu appendToBody>
@@ -213,7 +206,6 @@ function DatabasePageContent() {
               </MDBDropdownItem>
             </MDBDropdownMenu>
           </MDBDropdown>
-          <SelectFileButton></SelectFileButton>
         </div>
       </div>
       <div className={styles.outlet}>
