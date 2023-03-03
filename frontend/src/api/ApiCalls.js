@@ -105,7 +105,7 @@ export async function uploadFile(file){
   let data = new FormData()
   data.append('file', file)
   return fetch(
-      `${apiAddress}/${getUserRole()}/uploadFile`,
+      `${apiAddress}${isDepersonalised()}/${getUserRole()}/uploadFile`,
       {
         method: "POST",
         headers: {
@@ -113,5 +113,5 @@ export async function uploadFile(file){
         },
         body: data
       }
-  ).then(r => console.log(r))
+  ).then(r => ({ status: r.status, data: r.body }))
 }

@@ -61,25 +61,6 @@ public class PersonController {
     }
 
     /**
-     * @GetMapping(value = {"root/download", "admin/download"})
-     *     public ResponseEntity<Resource> downloadFile(@RequestParam String format) { // format: .xml .json
-     *         File file = new File(downloadPath + downloadFilename + format);
-     *         if (file.exists() && !file.isDirectory()) {
-     *             try {
-     *                 if (format.equals("json") && personService.uploadJSONFile(file)) {
-     *                     return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
-     *                 } else if (format.equals("json") && personService.uploadXMLFile(file)) {
-     *                     return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
-     *                 } else return ResponseEntity.badRequest().body(null);
-     *             } catch (IOException e) {
-     *                 return ResponseEntity.internalServerError().body(null);
-     *             }
-     *         }
-     *         return ResponseEntity.internalServerError().body(null);
-     *     }
-     */
-
-    /**
      * Depersonalise table.
      *
      * @return response entity with list of depersonalised people.
