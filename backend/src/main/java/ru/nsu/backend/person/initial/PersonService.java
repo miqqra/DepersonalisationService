@@ -184,33 +184,6 @@ public class PersonService {
         }
     }
 
-    public InitialPerson findOnePerson(String param) {
-        return personRepository.findBySur(param).orElse(
-                personRepository.findByFirst(param).orElse(
-                        personRepository.findByPatronymic(param).orElse(
-                                personRepository.findByWhereIssued(param).orElse(
-                                        personRepository.findByRegistration(param).orElse(
-                                                personRepository.findByWork(param).orElse(null))))));
-    }
-
-    public InitialPerson findOnePerson(Integer param) {
-        return personRepository.findByAge(param).orElse(
-                personRepository.findByNumber(param.toString()).orElse(
-                        personRepository.findBySeries(param.toString()).orElse(
-                                personRepository.findByTin(param.toString()).orElse(
-                                        personRepository.findBySnils(param.toString()).orElse(null)
-                                )
-                        )
-                )
-        );
-    }
-
-    public InitialPerson findOnePerson(LocalDate param) {
-        return personRepository.findByWhenIssued(param).orElse(
-                personRepository.findByDob(param).orElse(null)
-        );
-    }
-
     public List<InitialPerson> findPerson(String param){
         List<InitialPerson> people = personRepository.findAll();
         HashSet<InitialPerson> result = new HashSet<>();

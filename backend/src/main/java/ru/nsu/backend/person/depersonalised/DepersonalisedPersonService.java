@@ -13,6 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DepersonalisedPersonService {
@@ -66,7 +67,14 @@ public class DepersonalisedPersonService {
 
     public List<DepersonalisedPerson> depersonalisePeople(List<InitialPerson> people) {
         List<DepersonalisedPerson> depersonalisedPeople = new Depersonalisation(people).depersonaliseWithRandom(10);
-        depersonalisedPersonRepository.deleteAll();
+        for (DepersonalisedPerson depersonalisedPerson : depersonalisedPeople) {
+            Optional<DepersonalisedPerson> person = depersonalisedPersonRepository.findById(depersonalisedPerson.getId());
+            if (person.isPresent()){
+                updateInfo(depersonalisedPerson.getId(), depersonalisedPerson);
+            } else {
+                depersonalisedPersonRepository.save(depersonalisedPerson);
+            }
+        }
         depersonalisedPersonRepository.saveAll(depersonalisedPeople);
         return depersonalisedPeople.stream().limit(Person.MAX_PEOPLE_COUNT).toList();
     }
@@ -181,33 +189,6 @@ public class DepersonalisedPersonService {
         } else {
             return people.stream().limit(Person.MAX_PEOPLE_COUNT).sorted(comp.reversed()).toList();
         }
-    }
-
-    public DepersonalisedPerson findOnePerson(String param) {
-        return depersonalisedPersonRepository.findBySur(param).orElse(
-                depersonalisedPersonRepository.findByFirst(param).orElse(
-                        depersonalisedPersonRepository.findByPatronymic(param).orElse(
-                                depersonalisedPersonRepository.findByWhereIssued(param).orElse(
-                                        depersonalisedPersonRepository.findByRegistration(param).orElse(
-                                                depersonalisedPersonRepository.findByWork(param).orElse(null))))));
-    }
-
-    public DepersonalisedPerson findOnePerson(Integer param) {
-        return depersonalisedPersonRepository.findByAge(param).orElse(
-                depersonalisedPersonRepository.findByNumber(param.toString()).orElse(
-                        depersonalisedPersonRepository.findBySeries(param.toString()).orElse(
-                                depersonalisedPersonRepository.findByTin(param.toString()).orElse(
-                                        depersonalisedPersonRepository.findBySnils(param.toString()).orElse(null)
-                                )
-                        )
-                )
-        );
-    }
-
-    public DepersonalisedPerson findOnePerson(LocalDate param) {
-        return depersonalisedPersonRepository.findByWhenIssued(param).orElse(
-                depersonalisedPersonRepository.findByDob(param).orElse(null)
-        );
     }
 
     public List<DepersonalisedPerson> findPerson(String param){
