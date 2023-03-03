@@ -1,6 +1,10 @@
 package ru.nsu.backend.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.gson.internal.bind.CollectionTypeAdapterFactory;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -14,10 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class File2TableConverter {
 
@@ -78,13 +79,13 @@ public class File2TableConverter {
 
     private static List<InitialPerson> convertJson(InputStream file) {
 
-        //TODO: doesn't work. Need to be fixed
-
         ObjectMapper mapper = new ObjectMapper();
+        mapper
+                .registerModule(new JavaTimeModule())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         try {
-            //noinspection unchecked
-            return (List<InitialPerson>) mapper.readValue(file, List.class);
+            return Arrays.stream(mapper.readValue(file, InitialPerson[].class)).toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
