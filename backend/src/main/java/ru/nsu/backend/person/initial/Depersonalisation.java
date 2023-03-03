@@ -38,12 +38,6 @@ public class Depersonalisation {
      */
     public List<DepersonalisedPerson> depersonaliseWithRandom(int dateRange) {
         var personListDepersonalised = depersonalise();
-
-        int passportNum = 0;
-        int passportSeries = 0;
-        long snils = 0;
-        long tin = 0;
-
         Random random = new Random();
 
         for (var person : personListDepersonalised) {
@@ -56,33 +50,58 @@ public class Depersonalisation {
             );
 
             // passport
-            if (passportNum == 1000000) {
-                passportNum = 0;
-            }
-            if (passportSeries == 10000) {
-                passportSeries = 0;
-            }
+            int passportSeries = random.nextInt(6900, 7124);
+            int passportNum = random.nextInt(100000, 1000000);
 
-            String numberFormatted = String.format("%06d", passportNum++);
-            String seriesFormatted = String.format("%04d", passportSeries++);
+            String numberFormatted = String.format("%06d", passportNum);
+            String seriesFormatted = String.format("%04d", passportSeries);
 
             person.setNumber(numberFormatted);
             person.setSeries(seriesFormatted);
 
             // snils
-            if (snils == 100000000000L) {
-                snils = 0;
-            }
+            long snils = random.nextLong(100000000, 1000000000);
+            int control = 0;
+            int counter = 1;
 
-            String snilsFormatted = String.format("%011d", snils++);
+            for (var i = snils; i > 0; i /= 10) {
+                control += counter * (i % 10);
+                counter++;
+            }
+            control %= 101;
+            control = control == 100 ? 0 : control;
+
+            snils *= 100;
+            snils += control;
+
+            String snilsFormatted = String.format(
+                "%03d-%03d-%03d %02d",
+                snils / 100000000,
+                snils / 100000 % 1000,
+                snils / 100 % 1000,
+                snils % 100
+            );
             person.setSnils(snilsFormatted);
 
             // tin (ИНН)
-            if (tin == 1000000000000L) {
-                tin = 0;
-            }
+            long tin = random.nextLong((long) 1e9, (long) 1e10);
+            int[] factors1 = new int[]{7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
+            int[] factors2 = new int[]{3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8};
 
-            String tinFormatted = String.format("%012d", tin++);
+            int tinCounter = factors1.length - 1;
+            long n1 = 0, n2 = 0;
+            for (var i = tin; i > 0 ; i /= 10) {
+                n1 += factors1[tinCounter] * (i % 10);
+                n2 += factors2[tinCounter--] * (i % 10);
+            }
+            n1 %= 11;
+            n1 = n1 == 10 ? 0 : n1;
+
+            n2 += factors2[factors2.length - 1] * n1;
+
+            tin = tin * 100 + n1 * 10 + n2;
+
+            String tinFormatted = String.format("%012d", tin);
             person.setTin(tinFormatted);
         }
         return personListDepersonalised;
