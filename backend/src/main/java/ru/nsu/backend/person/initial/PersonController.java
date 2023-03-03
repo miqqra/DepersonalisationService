@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.backend.converter.File2TableConverter;
 import ru.nsu.backend.converter.TypesConverter;
+import ru.nsu.backend.person.Person;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPersonService;
 
@@ -28,8 +29,8 @@ public class PersonController {
             assert filename != null;
             String type = filename.substring(filename.lastIndexOf('.') + 1);
             System.out.println("Filename is: " + filename + "\nFiletype is: " + type);
-            List<InitialPerson> people = File2TableConverter.convert(file.getInputStream(), type);
-            for (InitialPerson person : people) {
+            List<Person> people = File2TableConverter.convert(file.getInputStream(), type);
+            for (Person person : people) {
                 try {
                     personService.updateInfo(person.getId(), person);
                 } catch (IllegalIdentifierException e) {

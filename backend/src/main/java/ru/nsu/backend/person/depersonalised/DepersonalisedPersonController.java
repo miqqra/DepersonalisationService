@@ -1,9 +1,13 @@
 package ru.nsu.backend.person.depersonalised;
 
 import lombok.AllArgsConstructor;
+import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import ru.nsu.backend.converter.File2TableConverter;
 import ru.nsu.backend.converter.TypesConverter;
+import ru.nsu.backend.person.Person;
 import ru.nsu.backend.person.initial.SortingType;
 
 import java.time.LocalDate;
@@ -15,6 +19,29 @@ import java.util.List;
 @AllArgsConstructor
 public class DepersonalisedPersonController {
     private final DepersonalisedPersonService depersonalisedPersonService;
+
+    @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
+    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file) {
+        try {
+            String filename = file.getOriginalFilename();
+            assert filename != null;
+            String type = filename.substring(filename.lastIndexOf('.') + 1);
+            System.out.println("Filename is: " + filename + "\nFiletype is: " + type);
+            List<Person> people = File2TableConverter.convert(file.getInputStream(), type);
+            for (Person person : people) {
+                try {
+                    depersonalisedPersonService.updateInfo(person.getId(), person);
+                } catch (IllegalIdentifierException e) {
+                    depersonalisedPersonService.addNewPerson(person);
+                }
+            }
+            return ResponseEntity.ok("Uploaded");
+        } catch (Exception e) {
+            System.out.println("An exception was cauth.");
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Can not accept the file");
+        }
+    }
 
     @GetMapping({"root/downloadFile", "admin/downloadFile", "user/downloadFile"})
     public ResponseEntity<byte[]> downloadFile(@RequestParam String fileType) {
