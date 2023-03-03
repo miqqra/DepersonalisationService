@@ -3,11 +3,9 @@ package ru.nsu.backend.person.depersonalised;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.backend.converter.TypesConverter;
 import ru.nsu.backend.person.initial.SortingType;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -17,46 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 public class DepersonalisedPersonController {
     private final DepersonalisedPersonService depersonalisedPersonService;
-
-//    @Value("${download.path}")
-//    private final String downloadPath;
-//    @Value("${download.filename}")
-//    private final String downloadFilename;
-
-    @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
-    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file) {
-        String format = "json";
-        System.out.println(file);
-        try {
-            if (format.equals("json") && depersonalisedPersonService.downloadJSONFile(file.getInputStream())) {
-                return ResponseEntity.ok("Downloaded");
-            } else if (format.equals("xml") && depersonalisedPersonService.downloadXMLFile(file.getInputStream())) {
-                return ResponseEntity.ok("Downloaded");
-            } else {
-                return ResponseEntity.badRequest().body("Can not download file");
-            }
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Can not download file");
-        }
-    }
-
-//    @GetMapping(value = {"root/download", "admin/download"})
-//    public ResponseEntity<Resource> downloadFile(@RequestParam String format) { // format: .xml .json
-//        File file = new File(downloadPath + downloadFilename + format);
-//        if (file.exists() && !file.isDirectory()) {
-//            try {
-//                if (format.equals("json") && depersonalisedPersonService.uploadJSONFile(file)) {
-//                    return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
-//                } else if (format.equals("json") && depersonalisedPersonService.uploadXMLFile(file)) {
-//                    return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
-//                } else return ResponseEntity.badRequest().body(null);
-//            } catch (IOException e) {
-//                return ResponseEntity.internalServerError().body(null);
-//            }
-//        }
-//        return ResponseEntity.internalServerError().body(null);
-//    }
-
 
     @GetMapping({"root/downloadFile", "admin/downloadFile", "user/downloadFile"})
     public ResponseEntity<byte[]> downloadFile(@RequestParam String fileType) {

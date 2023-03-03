@@ -1,14 +1,15 @@
 package ru.nsu.backend.person.initial;
 
 import lombok.AllArgsConstructor;
+import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.nsu.backend.converter.File2TableConverter;
 import ru.nsu.backend.converter.TypesConverter;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPersonService;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -20,25 +21,26 @@ public class PersonController {
     private final PersonService personService;
     private final DepersonalisedPersonService depersonalisedPersonService;
 
-//    @Value("${download.path}")
-//    private final String downloadPath;
-//    @Value("${download.filename}")
-//    private final String downloadFilename;
-
     @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
     public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file) {
-        String format = "json";
-        System.out.println(file);
         try {
-            if (format.equals("json") && personService.downloadJSONFile(file.getInputStream())) {
-                return ResponseEntity.ok("Downloaded");
-            } else if (format.equals("xml") && personService.downloadXMLFile(file.getInputStream())) {
-                return ResponseEntity.ok("Downloaded");
-            } else {
-                return ResponseEntity.badRequest().body("Can not download file");
+            String filename = file.getOriginalFilename();
+            assert filename != null;
+            String type = filename.substring(filename.lastIndexOf('.') + 1);
+            System.out.println("Filename is: " + filename + "\nFiletype is: " + type);
+            List<InitialPerson> people = File2TableConverter.convert(file.getInputStream(), type);
+            for (InitialPerson person : people) {
+                try {
+                    personService.updateInfo(person.getId(), person);
+                } catch (IllegalIdentifierException e) {
+                    personService.addNewPerson(person);
+                }
             }
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().body("Can not download file");
+            return ResponseEntity.ok("Uploaded");
+        } catch (Exception e) {
+            System.out.println("An exception was cauth.");
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Can not accept the file");
         }
     }
 
