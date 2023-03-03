@@ -1,20 +1,13 @@
 package ru.nsu.backend.person.initial;
 
-import org.apache.logging.log4j.message.MapMessage;
+import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.nsu.backend.fileutils.FileDownloadUploadUtils;
-import ru.nsu.backend.person.People;
 import ru.nsu.backend.person.Person;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -146,7 +139,9 @@ public class PersonService {
 
     @Transactional
     public void updateInfo(Integer personId, InitialPerson person) {
-        InitialPerson oldPerson = personRepository.findById(personId).orElse(person);
+        InitialPerson oldPerson = personRepository.findById(personId).orElseThrow(() -> {
+            throw new IllegalIdentifierException("Wrong id");
+        });
         oldPerson.setSur(person.getSur());
         oldPerson.setFirst(person.getFirst());
         oldPerson.setPatronymic(person.getPatronymic());
@@ -189,33 +184,6 @@ public class PersonService {
         }
     }
 
-    public InitialPerson findOnePerson(String param) {
-        return personRepository.findBySur(param).orElse(
-                personRepository.findByFirst(param).orElse(
-                        personRepository.findByPatronymic(param).orElse(
-                                personRepository.findByWhereIssued(param).orElse(
-                                        personRepository.findByRegistration(param).orElse(
-                                                personRepository.findByWork(param).orElse(null))))));
-    }
-
-    public InitialPerson findOnePerson(Integer param) {
-        return personRepository.findByAge(param).orElse(
-                personRepository.findByNumber(param.toString()).orElse(
-                        personRepository.findBySeries(param.toString()).orElse(
-                                personRepository.findByTin(param.toString()).orElse(
-                                        personRepository.findBySnils(param.toString()).orElse(null)
-                                )
-                        )
-                )
-        );
-    }
-
-    public InitialPerson findOnePerson(LocalDate param) {
-        return personRepository.findByWhenIssued(param).orElse(
-                personRepository.findByDob(param).orElse(null)
-        );
-    }
-
     public List<InitialPerson> findPerson(String param){
         List<InitialPerson> people = personRepository.findAll();
         HashSet<InitialPerson> result = new HashSet<>();
@@ -245,63 +213,5 @@ public class PersonService {
 
     public List<InitialPerson> getInitialData() {
         return personRepository.findAll().stream().limit(Person.MAX_PEOPLE_COUNT).toList();
-    }
-
-    public boolean uploadJSONFile(File file) {
-        try {
-            FileWriter fileWriter = new FileWriter(file);
-            List<InitialPerson> people = personRepository.findAll();
-            fileWriter.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.JSON));
-            fileWriter.close();
-        } catch (IOException e){
-            return false;
-        }
-        return true;
-    }
-
-    public boolean uploadXMLFile(File file) {
-        try {
-            FileWriter fileWriter = new FileWriter(file);
-            List<InitialPerson> people = personRepository.findAll();
-            fileWriter.write(FileDownloadUploadUtils.serialize(new People(people), MapMessage.MapFormat.XML));
-            fileWriter.close();
-        } catch (IOException e){
-            return false;
-        }
-        return true;
-    }
-
-    @SuppressWarnings("unchecked")
-    public boolean downloadJSONFile(InputStream file){
-        try {
-            List<InitialPerson> people = (List<InitialPerson>)
-                    FileDownloadUploadUtils
-                            .deserialize(
-                                    Arrays.toString(file.readAllBytes()),
-                                    MapMessage.MapFormat.JSON)
-                            .getPeople();
-            personRepository.deleteAll();
-            personRepository.saveAll(people);
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
-    }
-
-    @SuppressWarnings("unchecked")
-    public boolean downloadXMLFile(InputStream file){
-        try {
-            List<InitialPerson> people = (List<InitialPerson>)
-                    FileDownloadUploadUtils
-                            .deserialize(
-                                    Arrays.toString(file.readAllBytes()),
-                                    MapMessage.MapFormat.XML)
-                            .getPeople();
-            personRepository.deleteAll();
-            personRepository.saveAll(people);
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
     }
 }

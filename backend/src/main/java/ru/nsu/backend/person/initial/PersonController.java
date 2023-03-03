@@ -1,8 +1,11 @@
 package ru.nsu.backend.person.initial;
 
 import lombok.AllArgsConstructor;
+import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import ru.nsu.backend.converter.File2TableConverterInitial;
 import ru.nsu.backend.converter.TypesConverter;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPerson;
 import ru.nsu.backend.person.depersonalised.DepersonalisedPersonService;
@@ -18,25 +21,28 @@ public class PersonController {
     private final PersonService personService;
     private final DepersonalisedPersonService depersonalisedPersonService;
 
-//    @Value("${download.path}")
-//    private final String downloadPath;
-//    @Value("${download.filename}")
-//    private final String downloadFilename;
-
-//    @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
-//    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file, @RequestBody String format) {
-//        try {
-//            if (format.equals("json") && personService.downloadJSONFile(file.getInputStream())) {
-//                return ResponseEntity.ok("Downloaded");
-//            } else if (format.equals("xml") && personService.downloadXMLFile(file.getInputStream())) {
-//                return ResponseEntity.ok("Downloaded");
-//            } else {
-//                return ResponseEntity.badRequest().body("Can not download file");
-//            }
-//        } catch (IOException e) {
-//            return ResponseEntity.badRequest().body("Can not download file");
-//        }
-//    }
+    @PostMapping(value = {"/admin/uploadFile", "/root/uploadFile"})
+    public ResponseEntity<String> uploadFile(@RequestBody MultipartFile file) {
+        try {
+            String filename = file.getOriginalFilename();
+            assert filename != null;
+            String type = filename.substring(filename.lastIndexOf('.') + 1);
+            System.out.println("Filename is: " + filename + "\nFiletype is: " + type);
+            List<InitialPerson> people = File2TableConverterInitial.convert(file.getInputStream(), type);
+            for (InitialPerson person : people) {
+                try {
+                    personService.updateInfo(person.getId(), person);
+                } catch (IllegalIdentifierException e) {
+                    personService.addNewPerson(person);
+                }
+            }
+            return ResponseEntity.ok("Uploaded");
+        } catch (Exception e) {
+            System.out.println("An exception was cauth.");
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Can not accept the file");
+        }
+    }
 
     @GetMapping({"root/downloadFile", "admin/downloadFile"})
     public ResponseEntity<byte[]> downloadFile(@RequestParam String fileType) {
@@ -53,25 +59,6 @@ public class PersonController {
         }
         return ResponseEntity.badRequest().body("Can't download file".getBytes());
     }
-
-    /**
-     * @GetMapping(value = {"root/download", "admin/download"})
-     *     public ResponseEntity<Resource> downloadFile(@RequestParam String format) { // format: .xml .json
-     *         File file = new File(downloadPath + downloadFilename + format);
-     *         if (file.exists() && !file.isDirectory()) {
-     *             try {
-     *                 if (format.equals("json") && personService.uploadJSONFile(file)) {
-     *                     return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
-     *                 } else if (format.equals("json") && personService.uploadXMLFile(file)) {
-     *                     return ResponseEntity.ok(new InputStreamResource(new FileInputStream(file)));
-     *                 } else return ResponseEntity.badRequest().body(null);
-     *             } catch (IOException e) {
-     *                 return ResponseEntity.internalServerError().body(null);
-     *             }
-     *         }
-     *         return ResponseEntity.internalServerError().body(null);
-     *     }
-     */
 
     /**
      * Depersonalise table.

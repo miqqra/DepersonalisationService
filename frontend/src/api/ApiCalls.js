@@ -117,3 +117,18 @@ export async function addUser(credentials) {
     body: JSON.stringify(credentials),
   });
 }
+
+export async function uploadFile(file){
+  let data = new FormData()
+  data.append('file', file)
+  return fetch(
+      `${apiAddress}${isDepersonalised()}/${getUserRole()}/uploadFile`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+        body: data
+      }
+  ).then(r => ({ status: r.status, data: r.body }))
+}

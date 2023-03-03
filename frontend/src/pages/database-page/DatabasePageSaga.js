@@ -5,7 +5,7 @@ import {
   getDepersonalisedUsers,
   getUsers,
   updateDepersonalised,
-  updatePeople,
+  updatePeople, uploadFile,
   uploadSearchedUsers,
 } from "../../api/ApiCalls";
 import { createErrorToast, createSuccessToast } from "../../models/ToastModel";
@@ -16,6 +16,7 @@ import {
   downloadFileType,
   depersonaliseUsers,
   searchUsers,
+  uploadFileType
 } from "./DatabasePageActions";
 import { setIsDepersonalised, updateItems } from "./DatabasePageSlice";
 import { store } from "../../store/Store";
@@ -31,6 +32,7 @@ export function* databasePageSagaWatcher() {
   yield takeEvery(uploadDepersonalisedUsers, sagaGetDepersonalisedUsers);
   yield takeEvery(synchronizeUsers, sagaSynchronizeUsers);
   yield takeEvery(downloadFileType, sagaDownloadFile);
+  yield takeEvery(uploadFileType, sagaUploadFile)
 }
 
 function* sagaGetUsers() {
@@ -101,6 +103,18 @@ function* sagaSearchUsers(action) {
     mainCall: () => uploadSearchedUsers(action.payload),
     *onSuccess(response) {
       yield put(updateItems(response.data));
+    },
+    onAnyError() {
+      createErrorToast(`Ошибка сервера`);
+    },
+  });
+}
+
+function * sagaUploadFile(action) {
+  yield call(execApiCall, {
+    mainCall: () => uploadFile(action.payload),
+    onSuccess() {
+      createSuccessToast("Файл успешно загружен на сервер")
     },
     onAnyError() {
       createErrorToast(`Ошибка сервера`);
