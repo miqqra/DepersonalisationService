@@ -29,7 +29,7 @@ class File2TableConverterTest {
                 "17","17","17","17","17","M","0017-12-30","17","17","Kutateladze 17","0017-12-30","Kutateladze 17","17","17","17"
                 "18","18","18","18","18","M","0018-12-30","18","18","Kutateladze 18","0018-12-30","Kutateladze 18","18","18","18"
                 "19","19","19","19","19","M","0019-12-30","19","19","Kutateladze 19","0019-12-30","Kutateladze 19","19","19","19\"""";
-        System.out.println(File2TableConverter.convert(new ByteArrayInputStream(people.getBytes()), "csv"));
+        System.out.println(File2TableConverterDepersonalised.convert(new ByteArrayInputStream(people.getBytes()), "csv"));
     }
 
 }

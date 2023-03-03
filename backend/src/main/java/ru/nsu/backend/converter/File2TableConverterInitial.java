@@ -10,17 +10,20 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
-import ru.nsu.backend.person.Person;
+import ru.nsu.backend.person.initial.InitialPerson;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Queue;
 
-public class File2TableConverter {
-
-    public static List<Person> convert(InputStream file, @NotNull String format) {
+public class File2TableConverterInitial {
+    public static List<InitialPerson> convert(InputStream file, @NotNull String format) {
 
         return switch (format) {
             case "csv" -> convertCsv(file);
@@ -31,7 +34,7 @@ public class File2TableConverter {
 
     }
 
-    private static @NotNull List<Person> convertCsv(InputStream file) {
+    private static @NotNull List<InitialPerson> convertCsv(InputStream file) {
         try {
             List<String[]> people = new CSVReader(new InputStreamReader(file)).readAll();
             return matrix2Table(people);
@@ -40,7 +43,7 @@ public class File2TableConverter {
         }
     }
 
-    private static @NotNull List<Person> convertXlsx(InputStream file) {
+    private static @NotNull List<InitialPerson> convertXlsx(InputStream file) {
 
         // Finds the workbook instance for XLSX file
         XSSFWorkbook myWorkBook;
@@ -75,7 +78,7 @@ public class File2TableConverter {
         return matrix2Table(matrix);
     }
 
-    private static List<Person> convertJson(InputStream file) {
+    private static List<InitialPerson> convertJson(InputStream file) {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper
@@ -83,20 +86,20 @@ public class File2TableConverter {
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         try {
-            return Arrays.stream(mapper.readValue(file, Person[].class)).toList();
+            return Arrays.stream(mapper.readValue(file, InitialPerson[].class)).toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    private static @NotNull List<Person> matrix2Table(@NotNull List<String[]> matrix) {
+    private static @NotNull List<InitialPerson> matrix2Table(@NotNull List<String[]> matrix) {
 
-        List<Person> people = new ArrayList<>();
+        List<InitialPerson> people = new ArrayList<>();
 
         for (int i = 1; i < matrix.size(); i++) {
             String[] row = matrix.get(i);
-            people.add(new Person(
+            people.add(new InitialPerson(
                     Integer.parseInt(row[0]), row[1], row[2], row[3], Integer.parseInt(row[4]), row[5].charAt(0),
                     LocalDate.parse(row[6]), row[7], row[8], row[9], LocalDate.parse(row[10]), row[11], row[12],
                     row[13], row[14]

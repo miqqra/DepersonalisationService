@@ -5,9 +5,8 @@ import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.nsu.backend.converter.File2TableConverter;
+import ru.nsu.backend.converter.File2TableConverterDepersonalised;
 import ru.nsu.backend.converter.TypesConverter;
-import ru.nsu.backend.person.Person;
 import ru.nsu.backend.person.initial.SortingType;
 
 import java.time.LocalDate;
@@ -27,8 +26,8 @@ public class DepersonalisedPersonController {
             assert filename != null;
             String type = filename.substring(filename.lastIndexOf('.') + 1);
             System.out.println("Filename is: " + filename + "\nFiletype is: " + type);
-            List<Person> people = File2TableConverter.convert(file.getInputStream(), type);
-            for (Person person : people) {
+            List<DepersonalisedPerson> people = File2TableConverterDepersonalised.convert(file.getInputStream(), type);
+            for (DepersonalisedPerson person : people) {
                 try {
                     depersonalisedPersonService.updateInfo(person.getId(), person);
                 } catch (IllegalIdentifierException e) {
