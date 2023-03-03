@@ -15,8 +15,7 @@ export const saveUserRole = (roles) => {
 };
 export const getUserRole = () => Cookies.get(USER_ROLE);
 export const deleteUserRole = () => Cookies.remove(USER_ROLE);
-export const saveAccessToken = (token) =>
-  Cookies.set(ACCESS_TOKEN, token, { expires: 1 });
+export const saveAccessToken = (token) => Cookies.set(ACCESS_TOKEN, token);
 export const getAccessToken = () => Cookies.get(ACCESS_TOKEN);
 export const deleteAccessToken = () => Cookies.remove(ACCESS_TOKEN);
 export const saveRefreshToken = (token) =>

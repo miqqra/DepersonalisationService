@@ -1,114 +1,70 @@
 import styles from "./styles/Profile.module.scss";
-import { BiHappy, BiHappyBeaming, BiMeh } from "react-icons/bi";
-import { getUserRole } from "../../api/Cookie";
-import {
-  MDBBtn,
-  MDBBtnGroup,
-  MDBInput,
-  MDBRadio,
-  MDBValidation,
-  MDBValidationItem,
-} from "mdb-react-ui-kit";
+import { BiNoEntry, BiUserPlus } from "react-icons/bi";
+import { MDBBtn } from "mdb-react-ui-kit";
 import { useState } from "react";
-import { addNewUser } from "../login-page/LoginPageActions";
-import { useDispatch } from "react-redux";
+import { AddUserModal } from "./ProfilePageContent";
+import UserRoleBlock from "../../components/user-role-block/UserRoleBlock";
+import RootEmoji from "../../assets/superuser.png";
+import AdminEmoji from "../../assets/admin.png";
+import UserEmoji from "../../assets/user.png";
 
-function ProfilePage() {
-  const dispatch = useDispatch();
-  const userRole = getUserRole();
-  const [formValue, setFormValue] = useState({
-    username: "",
-    password: "",
-    roles: "user",
-  });
-  const onChange = (e) => {
-    setFormValue({ ...formValue, [e.target.name]: e.target.value });
-  };
-  const onSubmit = () => {
-    dispatch(addNewUser(formValue));
-  };
-
-  const HeaderContent = () => {
-    if (userRole === "user") {
-      return (
+function HeaderContent() {
+  return (
+    <>
+      <UserRoleBlock role="user">
         <div className={styles.header_content}>
-          <BiMeh size={"100"} />
+          <img src={UserEmoji} alt="Пользователь"></img>
           <h2>Пользователь</h2>
         </div>
-      );
-    } else if (userRole === "admin") {
-      return (
+      </UserRoleBlock>
+      <UserRoleBlock role="admin">
         <div className={styles.header_content}>
-          <BiHappy size={"100"} />
+          <img src={AdminEmoji} alt="Админ"></img>
           <h2>Админ</h2>
         </div>
-      );
-    } else if (userRole === "root") {
-      return (
+      </UserRoleBlock>
+      <UserRoleBlock role="root">
         <div className={styles.header_content}>
-          <BiHappyBeaming size={"100"} />
+          <img src={RootEmoji} alt="Суперпользователь"></img>
           <h2>Суперпользователь</h2>
         </div>
-      );
-    }
-  };
+      </UserRoleBlock>
+    </>
+  );
+}
+
+function ProfilePage() {
+  const [addUserModal, setAddUserModal] = useState(false);
 
   return (
     <div className={styles.root}>
-      <div className={styles.header}>{<HeaderContent />}</div>
+      <div className={styles.header}>
+        <HeaderContent />
+      </div>
       <div className={styles.outlet}>
-        {userRole === "user" ? (
-          <h1>У вас нет прав на добавление новых пользователей</h1>
-        ) : (
-          <MDBValidation
-            className={styles.form}
-            onSubmit={onSubmit}
-            isValidated
+        <UserRoleBlock role="root">
+          <MDBBtn
+            className={styles.action_button}
+            color={"dark"}
+            outline
+            onClick={() => setAddUserModal(!addUserModal)}
           >
-            <MDBValidationItem feedback="Введите логин" invalid>
-              <MDBInput
-                value={formValue.username}
-                name="username"
-                onChange={onChange}
-                id="loginInput"
-                required
-                label="Логин"
-              />
-            </MDBValidationItem>
-            <MDBValidationItem feedback="Введите пароль" invalid>
-              <MDBInput
-                value={formValue.password}
-                name="password"
-                type="password"
-                onChange={onChange}
-                id="passwordInput"
-                required
-                label="Пароль"
-              />
-            </MDBValidationItem>
-            <MDBBtnGroup shadow={"0"}>
-              <MDBRadio
-                name="options"
-                wrapperTag="span"
-                label="Пользователь"
-                onClick={() => setFormValue({ ...formValue, roles: "user" })}
-                disabled={userRole === "user"}
-                defaultChecked
-              />
-              <MDBRadio
-                name="options"
-                wrapperClass="mx-2"
-                wrapperTag="span"
-                label="Админ"
-                disabled={userRole !== "root"}
-                onClick={() => setFormValue({ ...formValue, roles: "admin" })}
-              />
-            </MDBBtnGroup>
-            <MDBBtn type="submit" outline color="dark">
-              Добавить пользователя
-            </MDBBtn>
-          </MDBValidation>
-        )}
+            <BiUserPlus size={"50"} />
+            Добавить пользователя
+          </MDBBtn>
+          <AddUserModal isActive={addUserModal} setIsActive={setAddUserModal} />
+        </UserRoleBlock>
+        <UserRoleBlock role="user">
+          <MDBBtn
+            className={styles.action_button}
+            color={"dark"}
+            disabled
+            onClick={() => setAddUserModal(!addUserModal)}
+          >
+            <BiNoEntry size={"50"} />
+            Нет доступных действий
+          </MDBBtn>
+        </UserRoleBlock>
       </div>
     </div>
   );

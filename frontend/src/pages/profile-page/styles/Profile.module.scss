@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  background-image: url("./bg.png");
 }
 
 .header {
@@ -11,7 +12,6 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background: lightgray;
 }
 
 .header_content {
@@ -19,10 +19,18 @@
 }
 
 .outlet {
+  padding: 20px;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
   flex-grow: 1;
+}
+
+.action_button {
+  display: flex;
+  @include column-center;
+  height: fit-content;
 }
 
 .form {

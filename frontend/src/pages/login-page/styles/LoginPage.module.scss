@@ -6,6 +6,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background-image: url("./bg.png");
+}
+
+.island {
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  border: 2px solid darkgray;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.5);
 }
 
 .form {

@@ -95,7 +95,7 @@ export async function updateDepersonalised() {
   return fetch(apiAddress + `/${role}/updated`, {
     method: "GET",
     headers: getAccessTokenHeader(),
-  }).then((r) => ({ status: r.status }));
+  }).then((r) => r.json().then((data) => ({ status: r.status, data: data })));
 }
 
 export async function uploadSearchedUsers(param) {
@@ -118,17 +118,17 @@ export async function addUser(credentials) {
   });
 }
 
-export async function uploadFile(file){
-  let data = new FormData()
-  data.append('file', file)
+export async function uploadFile(file) {
+  let data = new FormData();
+  data.append("file", file);
   return fetch(
-      `${apiAddress}${isDepersonalised()}/${getUserRole()}/uploadFile`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${getAccessToken()}`,
-        },
-        body: data
-      }
-  ).then(r => ({ status: r.status, data: r.body }))
+    `${apiAddress}${isDepersonalised()}/${getUserRole()}/uploadFile`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      body: data,
+    }
+  ).then((r) => ({ status: r.status, data: r.body }));
 }
