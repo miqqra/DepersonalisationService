@@ -98,6 +98,8 @@ public class Depersonalisation {
             n1 = n1 == 10 ? 0 : n1;
 
             n2 += factors2[factors2.length - 1] * n1;
+            n2 %= 11;
+            n2 = n2 == 10 ? 0 : n2;
 
             tin = tin * 100 + n1 * 10 + n2;
 
