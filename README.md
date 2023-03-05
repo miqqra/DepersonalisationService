@@ -1,3 +1,5 @@
+The service was made as part of a hackathon from SovKomBank/сервис был сделан в рамках хакатона от СовКомБанка
+
 # Depersonalization service
 
 Лёгкий в использовании сервис по деперсонализации данных, основанный на перемешивании
